@@ -1,0 +1,33 @@
+{
+  "note": "Sanity-check baseline only \u2014 not a claim of clinical accuracy or of superiority over the classical k-NN method. Compare only within the same data_source; synthetic_demo_data rows are not real EMG.",
+  "k_neighbors": 5,
+  "rows": [
+    {
+      "subject": "synthetic_subject_1",
+      "data_source": "synthetic_demo_data",
+      "split": "repetitions 1-2 train / repetitions >=3 eval",
+      "n_train_windows": 38,
+      "n_eval_windows": 920,
+      "knn_rms_accuracy": 0.2337,
+      "myocopilot_mock_clean_accuracy": 0.6992
+    },
+    {
+      "subject": "synthetic_subject_2",
+      "data_source": "synthetic_demo_data",
+      "split": "repetitions 1-2 train / repetitions >=3 eval",
+      "n_train_windows": 38,
+      "n_eval_windows": 920,
+      "knn_rms_accuracy": 0.2348,
+      "myocopilot_mock_clean_accuracy": 0.7117
+    },
+    {
+      "subject": "synthetic_subject_3",
+      "data_source": "synthetic_demo_data",
+      "split": "repetitions 1-2 train / repetitions >=3 eval",
+      "n_train_windows": 38,
+      "n_eval_windows": 920,
+      "knn_rms_accuracy": 0.2348,
+      "myocopilot_mock_clean_accuracy": 0.7166
+    }
+  ]
+}

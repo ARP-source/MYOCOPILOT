@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>MYO·HAND R2 — procedural myoelectric prosthetic (right)</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#0d0e10; --line:#23252b; --panel:rgba(15,16,19,.94);
+    --txt:#e9e6df; --dim:#8a8d94; --dim2:#54575e;
+    --cyan:#35dbe8; --cyan-dim:rgba(53,219,232,.10);
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+    --disp:'Space Grotesk',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font-family:var(--disp)}
+  #stage{position:fixed;inset:0}
+  canvas{display:block}
+  button,input{font-family:inherit}
+
+  .vignette{position:fixed;inset:0;pointer-events:none;z-index:2;
+            background:radial-gradient(ellipse at 42% 44%, transparent 52%, rgba(0,0,0,.44) 100%)}
+
+  /* ---------- minimal always-on caption ---------- */
+  .caption{position:fixed;left:28px;bottom:26px;z-index:5;pointer-events:none;user-select:none}
+  .cap-k{font:500 9px/1 var(--mono);letter-spacing:.30em;color:var(--dim2);text-transform:uppercase}
+  .cap-pose{display:flex;align-items:center;gap:9px;margin:9px 0 8px;
+            font:500 15px/1 var(--mono);letter-spacing:.06em;color:#c8eef2}
+  .cap-dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);
+           box-shadow:0 0 12px rgba(53,219,232,.85)}
+  .cap-meta{font:400 10px/1 var(--mono);letter-spacing:.10em;color:var(--dim2)}
+
+  .hint{position:fixed;top:22px;right:26px;z-index:5;text-align:right;pointer-events:none;user-select:none;
+        font:400 9px/2 var(--mono);letter-spacing:.16em;color:#43464d;text-transform:uppercase}
+
+  /* ---------- debug panel (hidden until HandRig.setDebugUI(true)) ---------- */
+  .bar{position:fixed;left:0;right:0;bottom:0;height:64px;z-index:10;display:flex;align-items:stretch;
+       background:var(--panel);border-top:1px solid var(--line);backdrop-filter:blur(12px);user-select:none;
+       transform:translateY(110%);transition:transform .45s cubic-bezier(.22,.75,.25,1)}
+  body.debug .bar{transform:none}
+  .bar section{display:flex;align-items:center;gap:12px;padding:0 16px;border-right:1px solid var(--line)}
+  .bar section:last-child{border-right:0}
+  .brand-name{font:700 14px/1 var(--disp);letter-spacing:.05em}
+  .brand-name em{color:var(--cyan);font-style:normal}
+  .brand-sub{font:400 8px/1 var(--mono);color:var(--dim2);letter-spacing:.2em;margin-top:5px}
+  .poses{flex:1;gap:3px;overflow-x:auto;scrollbar-width:none}
+  .poses::-webkit-scrollbar{height:0}
+  button.pose{flex-shrink:0;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;
+              padding:9px 10px 7px;text-transform:uppercase;color:var(--dim);text-align:left}
+  button.pose small{display:block;font:500 8px/1 var(--mono);letter-spacing:.2em;color:var(--dim2);margin-bottom:4px}
+  button.pose span{font:500 10px/1 var(--mono);letter-spacing:.08em}
+  button.pose:hover{color:var(--txt)}
+  button.pose.active{color:var(--cyan);border-bottom-color:var(--cyan);background:var(--cyan-dim)}
+  button.toggle{display:flex;align-items:center;gap:8px;background:none;cursor:pointer;
+                border:1px solid var(--line);padding:9px 12px;color:var(--dim);
+                font:500 9px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
+  button.toggle .led{width:7px;height:7px;border-radius:50%;background:#33363c;transition:background .15s,box-shadow .15s}
+  button.toggle:hover{color:var(--txt)}
+  button.toggle.on{color:var(--txt);border-color:var(--cyan)}
+  button.toggle.on .led{background:var(--cyan);box-shadow:0 0 9px rgba(53,219,232,.9)}
+  .sliders{gap:14px}
+  .sliders .row{display:flex;align-items:center;gap:8px}
+  .sliders .k{font:500 8px/1 var(--mono);letter-spacing:.18em;color:var(--dim2);text-transform:uppercase}
+  .sliders .v{font:400 10px/1 var(--mono);color:var(--dim);width:38px}
+
+  input[type=range]{-webkit-appearance:none;appearance:none;width:96px;height:16px;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:2px;background:#2b2e34}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;margin-top:-4.5px;background:var(--cyan);border-radius:50%}
+  input[type=range]::-moz-range-track{height:2px;background:#2b2e34}
+  input[type=range]::-moz-range-thumb{width:11px;height:11px;background:var(--cyan);border:0;border-radius:50%}
+
+  @media (max-width:900px){ .brand-sub,.hint{display:none} .sliders{display:none} }
+</style>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+
+<div id="stage"></div>
+<div class="vignette"></div>
+
+<div class="caption">
+  <div class="cap-k">Myoelectric prosthetic · right</div>
+  <div class="cap-pose"><span class="cap-dot" id="capDot"></span><span id="capPose">neutral</span></div>
+  <div class="cap-meta" id="capMeta">confidence 0.75 · activation 0.00</div>
+</div>
+
+<div class="hint">
+  drag orbit · scroll zoom<br/>d — debug panel · 1–9 poses
+</div>
+
+<nav class="bar" id="debugBar">
+  <section>
+    <div>
+      <div class="brand-name">MYO·HAND <em>R2</em></div>
+      <div class="brand-sub">PROCEDURAL PROSTHETIC · DEV PANEL</div>
+    </div>
+  </section>
+  <section class="poses" id="poseButtons"></section>
+  <section>
+    <button class="toggle" id="cycleBtn"><span class="led"></span>cycle</button>
+    <button class="toggle" id="turnBtn"><span class="led"></span>turntable</button>
+  </section>
+  <section class="sliders">
+    <div class="row"><span class="k">conf</span><input type="range" id="confSlider" min="0" max="100" value="75"/><span class="v" id="confVal">0.75</span></div>
+    <div class="row"><span class="k">act</span><input type="range" id="actSlider" min="0" max="100" value="0"/><span class="v" id="actVal">0.00</span></div>
+  </section>
+</nav>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls }      from 'three/addons/controls/OrbitControls.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { RoomEnvironment }    from 'three/addons/environments/RoomEnvironment.js';
+import { Reflector }          from 'three/addons/objects/Reflector.js';
+
+const DEG = Math.PI / 180, TAU = Math.PI * 2;
+
+/* ================================================================
+   RENDERER · SCENE · CAMERA
+   ================================================================ */
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+document.getElementById('stage').appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0d0e10);
+
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+pmrem.dispose();
+
+// Orbit target is pushed to +X so the hand frames slightly LEFT of
+// center — the right side of the viewport stays empty for dashboards.
+const camera = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 0.1, 60);
+camera.position.set(0.35, 0.75, 5.6);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0.42, 0.12, 0);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.minDistance = 2.4;
+controls.maxDistance = 11;
+controls.maxPolarAngle = 1.62;
+
+/* ================================================================
+   STUDIO LIGHTING — key + fill + rim
+   ================================================================ */
+const key = new THREE.DirectionalLight(0xfff1de, 2.6);
+key.position.set(3.2, 7.0, 4.0);
+key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048);
+Object.assign(key.shadow.camera, { left: -3.5, right: 3.5, top: 4.5, bottom: -3, near: 1, far: 20 });
+key.shadow.bias = -0.0004;
+key.shadow.normalBias = 0.03;
+scene.add(key);
+
+const fill = new THREE.DirectionalLight(0xcdd6e2, 0.7);
+fill.position.set(-5, 2, 3.5);
+scene.add(fill);
+
+const rim = new THREE.DirectionalLight(0xffe6c4, 2.1);
+rim.position.set(-2.5, 3.5, -5.5);
+scene.add(rim);
+
+scene.add(new THREE.HemisphereLight(0x9aa3b0, 0x15161a, 0.45));
+
+/* ================================================================
+   MATERIALS — composite shell / graphite / titanium / LEDs
+   ================================================================ */
+const shellMat   = new THREE.MeshStandardMaterial({ color: 0xe9e5dd, roughness: 0.42, metalness: 0.04, envMapIntensity: 0.55 });
+const shellMat2  = new THREE.MeshStandardMaterial({ color: 0xdfdacd, roughness: 0.48, metalness: 0.04, envMapIntensity: 0.50 });
+const graphite   = new THREE.MeshStandardMaterial({ color: 0x24262a, roughness: 0.50, metalness: 0.40, envMapIntensity: 0.70 });
+const graphite2  = new THREE.MeshStandardMaterial({ color: 0x1b1d20, roughness: 0.88, metalness: 0.10 });   // grip pads / sensor core
+const titanium   = new THREE.MeshStandardMaterial({ color: 0xb8bcc2, roughness: 0.28, metalness: 1.00, envMapIntensity: 1.00 });
+const ledCyan    = new THREE.MeshStandardMaterial({ color: 0x0a2e33, emissive: 0x35dbe8, emissiveIntensity: 1.6, roughness: 0.4 });  // palm slit (activation-linked)
+const ledStrip   = ledCyan.clone();   // forearm emitter strip (activation-linked)
+const ledCollar  = ledCyan.clone();   // thin wrist gasket ring (activation-linked)
+
+/* ================================================================
+   JOINT REGISTRY
+   Every pivot is a THREE.Group at the anatomical bend point; the
+   animated quaternion = anatomical base · Q(axis1) · Q(axis2)…
+   ================================================================ */
+const joints = {}, jointDefs = {};
+const AX = { x: new THREE.Vector3(1,0,0), y: new THREE.Vector3(0,1,0), z: new THREE.Vector3(0,0,1) };
+let _phase = 0;
+
+function defineJoint(name, order, base) {
+  const g = new THREE.Group();
+  joints[name] = g;
+  jointDefs[name] = { order, base: base ?? new THREE.Quaternion(), phase: (_phase += 2.4) };
+  return g;
+}
+
+/* ================================================================
+   BIONIC PART BUILDERS
+   ================================================================ */
+// Hinge = graphite barrel (dark joint gap) + titanium pin protruding
+// on both sides — the "internal linkage" seen at every knuckle.
+function hingeBarrel(r, span, pinSpan) {
+  const g = new THREE.Group();
+  const barrel = new THREE.Mesh(new THREE.CylinderGeometry(r, r, span, 24), graphite);
+  barrel.rotation.z = Math.PI / 2;
+  g.add(barrel);
+  if (pinSpan) {
+    const pin = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.36, r * 0.36, pinSpan, 16), titanium);
+    pin.rotation.z = Math.PI / 2;
+    g.add(pin);
+  }
+  return g;
+}
+
+// One phalanx: warm-white rounded-rect composite shell, brushed
+// titanium dorsal plate, optional dark grip pad on the palmar face.
+// Body stops 0.045 short of the next pivot so the hinge reads as a gap.
+function shellSeg(len, w, d, opts = {}) {
+  const g = new THREE.Group();
+  const h = len - 0.045;
+  const body = new THREE.Mesh(
+    new RoundedBoxGeometry(w, h, d, 4, Math.min(w, d) * (opts.round ?? 0.34)), shellMat);
+  body.position.y = h / 2 + 0.012;
+  g.add(body);
+  if (opts.plate !== false) {
+    const plate = new THREE.Mesh(new RoundedBoxGeometry(w * 0.82, h * 0.46, 0.016, 2, 0.006), titanium);
+    plate.position.set(0, h * 0.55, -d / 2 - 0.004);
+    g.add(plate);
+  }
+  if (opts.pad) {
+    const pad = new THREE.Mesh(new RoundedBoxGeometry(w * 0.74, h * 0.62, 0.022, 2, 0.008), graphite2);
+    pad.position.set(0, h * 0.42, d / 2 + 0.004);
+    g.add(pad);
+  }
+  return g;
+}
+
+/* ================================================================
+   HAND ASSEMBLY
+   Frame: fingers grow along +Y, palm faces +Z (camera), thumb on −X
+   (correct chirality for a RIGHT hand, palm toward viewer).
+   ================================================================ */
+const stage = new THREE.Group();
+stage.rotation.y = 0.30;
+scene.add(stage);
+
+const handRoot = new THREE.Group();
+stage.add(handRoot);
+
+// forearm roll pivot (pronation/supination) — wrist-level, on the
+// long axis, so cuff + rings twist together
+const roll = defineJoint('forearm_roll', ['y']);
+handRoot.add(roll);
+
+/* ---------- slim forearm cuff: layered composite rings ---------- */
+const cuff = new THREE.Mesh(new THREE.CylinderGeometry(0.345, 0.305, 1.15, 48), shellMat2);
+cuff.position.y = -0.95;
+roll.add(cuff);
+
+[[0.346, 0.075, -0.52, graphite], [0.347, 0.060, -0.86, titanium], [0.346, 0.075, -1.20, graphite]]
+  .forEach(([r, h, y, m]) => {
+    const ring = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 48), m);
+    ring.position.y = y;
+    roll.add(ring);
+  });
+
+// machined seam collar where the cuff meets the wrist unit
+const cuffTopCollar = new THREE.Mesh(new THREE.CylinderGeometry(0.352, 0.352, 0.05, 48), titanium);
+cuffTopCollar.position.y = -0.385;
+roll.add(cuffTopCollar);
+
+const cuffCap = new THREE.Mesh(new THREE.CylinderGeometry(0.312, 0.298, 0.07, 48), graphite);
+cuffCap.position.y = -1.545;
+roll.add(cuffCap);
+
+// cyan emitter strip + two status dots (activation-driven)
+const strip = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.68, 0.018), ledStrip);
+strip.position.set(0, -0.92, 0.328);
+roll.add(strip);
+[-0.085, 0.085].forEach(x => {
+  const dot = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.024, 0.012, 20), ledStrip);
+  dot.rotation.x = Math.PI / 2;
+  dot.position.set(x, -1.22, 0.306);
+  roll.add(dot);
+});
+
+// soft cyan light spill from the emitter onto the scene
+const emitterLight = new THREE.PointLight(0x35dbe8, 0, 2.4, 2);
+emitterLight.position.set(0, -0.9, 0.55);
+roll.add(emitterLight);
+
+/* ---------- wrist actuator unit: continuous ball-and-socket ---------- */
+// The SOCKET (taper cone + ball) stays with the forearm and bridges
+// the cuff into the pivot with zero air gap; the HOUSING yoke goes
+// with the hand and nests into the ball, so at every wrist angle the
+// hand emerges from solid material — flexion reveals the ball
+// articulating in its yoke instead of a void.
+const wristCone = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.345, 0.30, 48), graphite);
+wristCone.position.y = -0.235;            // spans −0.385…−0.085, overlaps cuff top + ball
+roll.add(wristCone);
+
+const socketBall = new THREE.Mesh(new THREE.SphereGeometry(0.215, 36, 26), graphite);
+socketBall.position.y = -0.005;           // centred on the wrist pivot
+roll.add(socketBall);
+
+// glowing gasket seam just below the titanium collar
+const collarRing = new THREE.Mesh(new THREE.TorusGeometry(0.352, 0.007, 8, 72), ledCollar);
+collarRing.rotation.x = Math.PI / 2;
+collarRing.position.y = -0.425;
+roll.add(collarRing);
+
+// wrist: x = palmarflex(+)/extension(−), z = radial/ulnar deviation
+const wrist = defineJoint('wrist', ['x', 'z']);
+roll.add(wrist);
+
+// housing yoke: deep rounded box whose proximal end sits inside the
+// socket ball — its bottom rim (sweep radius ≤0.15) stays buried in
+// the ball (r 0.215) even at ±55°, so the joint never shows a hole.
+const wristHousing = new THREE.Mesh(new RoundedBoxGeometry(0.56, 0.36, 0.30, 4, 0.11), graphite);
+wristHousing.position.y = 0.05;           // spans −0.13…0.23, tucks under the palm shell
+wrist.add(wristHousing);
+const wristPin = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.032, 0.62, 16), titanium);
+wristPin.rotation.z = Math.PI / 2;
+wrist.add(wristPin);
+
+/* ---------- palm: tapered composite shell + thumb-base volume ---------- */
+const palmGeo = new RoundedBoxGeometry(0.88, 0.86, 0.28, 5, 0.10);
+{
+  const p = palmGeo.attributes.position;
+  for (let i = 0; i < p.count; i++) {
+    const t = THREE.MathUtils.clamp((0.43 - p.getY(i)) / 0.86, 0, 1);  // 0 at knuckles → 1 at wrist
+    p.setX(i, p.getX(i) * (1 - 0.19 * t));
+    p.setZ(i, p.getZ(i) * (1 - 0.10 * t));
+  }
+  palmGeo.computeVertexNormals();
+}
+const palm = new THREE.Mesh(palmGeo, shellMat);
+palm.position.y = 0.62;
+wrist.add(palm);
+
+// palmar sensor core + LED slit (activation-linked)
+const core = new THREE.Mesh(new RoundedBoxGeometry(0.44, 0.50, 0.07, 3, 0.025), graphite2);
+core.position.set(0, 0.50, 0.115);
+wrist.add(core);
+const palmSlit = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.028, 0.014), ledCyan);
+palmSlit.position.set(0, 0.50, 0.152);
+wrist.add(palmSlit);
+
+// dorsal link plate + fastener dots
+const dorsalPlate = new THREE.Mesh(new RoundedBoxGeometry(0.34, 0.44, 0.03, 2, 0.012), graphite);
+dorsalPlate.position.set(0, 0.55, -0.126);
+wrist.add(dorsalPlate);
+[-0.10, 0.10].forEach(x => {
+  const screw = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.012, 14), titanium);
+  screw.rotation.x = Math.PI / 2;
+  screw.position.set(x, 0.72, -0.142);
+  wrist.add(screw);
+});
+
+// thenar / hypothenar shell bulges → believable thumb-base volume
+// (thenar raised slightly so it clears the larger socket ball)
+const thenar = new THREE.Mesh(new RoundedBoxGeometry(0.32, 0.58, 0.26, 4, 0.10), shellMat2);
+thenar.position.set(-0.27, 0.45, 0.09);
+thenar.rotation.set(0.30, 0, 0.45);
+wrist.add(thenar);
+
+const hypothenar = new THREE.Mesh(new RoundedBoxGeometry(0.22, 0.40, 0.22, 4, 0.08), shellMat2);
+hypothenar.position.set(0.31, 0.48, 0.02);
+hypothenar.rotation.z = -0.28;
+wrist.add(hypothenar);
+
+// one-piece dark MCP actuator block (the "knuckle band")
+const knuckleBlock = new THREE.Mesh(new RoundedBoxGeometry(0.92, 0.20, 0.235, 4, 0.07), graphite);
+knuckleBlock.position.set(0, 1.0, 0.055);
+wrist.add(knuckleBlock);
+[-0.465, 0.465].forEach(x => {
+  const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.032, 0.05, 14), titanium);
+  cap.rotation.z = Math.PI / 2;
+  cap.position.set(x, 1.0, 0.13);
+  wrist.add(cap);
+});
+
+/* ---------- four fingers (MCP → PIP → DIP) ---------- */
+// length hierarchy: middle longest · index/ring close · pinky shortest
+function buildFinger(prefix, x, mcpY, L, W) {
+  const mcp = defineJoint(prefix + '_mcp', ['x', 'z']);    // x flexion · z abduction (+ = toward thumb)
+  mcp.position.set(x, mcpY, 0.13);
+  mcp.add(hingeBarrel(0.068, W[0] + 0.025, 0));            // housed inside the knuckle block
+  mcp.add(shellSeg(L[0], W[0], W[0] - 0.012));
+
+  const pip = defineJoint(prefix + '_pip', ['x']);
+  pip.position.y = L[0];
+  pip.add(hingeBarrel(0.058, W[1] + 0.030, W[1] + 0.075)); // titanium pin visible either side
+  pip.add(shellSeg(L[1], W[1], W[1] - 0.012));
+  mcp.add(pip);
+
+  const dip = defineJoint(prefix + '_dip', ['x']);
+  dip.position.y = L[1];
+  dip.add(hingeBarrel(0.052, W[2] + 0.028, W[2] + 0.070));
+  dip.add(shellSeg(L[2], W[2], W[2] - 0.012, { round: 0.44, pad: true }));  // rounded tip + grip pad
+  pip.add(dip);
+
+  wrist.add(mcp);
+}
+buildFinger('index',  -0.30, 1.000, [0.400, 0.260, 0.215], [0.165, 0.150, 0.140]);
+buildFinger('middle', -0.10, 1.035, [0.440, 0.290, 0.235], [0.170, 0.155, 0.145]);
+buildFinger('ring',    0.10, 1.000, [0.410, 0.270, 0.220], [0.160, 0.147, 0.138]);
+buildFinger('pinky',   0.295, 0.930, [0.315, 0.205, 0.190], [0.145, 0.135, 0.128]);
+
+/* ---------- thumb: CMC (2-DOF) + IP — short, thick, 45° diagonal ---------- */
+// Base frame: local Y = rest direction (out −X, forward +Z, 45° planar
+// sweep); local X = opposition axis chosen so the flexion curl plane
+// passes exactly through the index-fingertip contact zone (verified FK:
+// pinch tips land within ~0.13 u — pad contact).
+const tY = new THREE.Vector3(-0.7227, 0.3011, 0.6223).normalize();
+const tZ = new THREE.Vector3( 0.6528, 0.5937, 0.4706).normalize();
+const tX = new THREE.Vector3().crossVectors(tY, tZ).normalize();
+const thumbBase = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(tX, tY, tZ));
+
+const cmc = defineJoint('thumb_cmc', ['x', 'z'], thumbBase);
+cmc.position.set(-0.40, 0.30, 0.16);
+wrist.add(cmc);
+
+// static saddle housing on the palm, merging into the thenar bulge
+const cmcHousing = new THREE.Mesh(new RoundedBoxGeometry(0.30, 0.28, 0.26, 4, 0.09), graphite);
+cmcHousing.position.set(-0.40, 0.28, 0.16);
+cmcHousing.rotation.set(0.30, 0, 0.35);
+wrist.add(cmcHousing);
+
+const TWIST = -1.31;  // cosmetic roll so plates/pads face dorsal/palmar; joints stay untwisted
+cmc.add(hingeBarrel(0.075, 0.24, 0.30));
+const tSeg1 = new THREE.Group();
+tSeg1.rotation.y = TWIST;
+tSeg1.add(shellSeg(0.50, 0.205, 0.190));
+const tCollar = new THREE.Mesh(new RoundedBoxGeometry(0.212, 0.040, 0.198, 2, 0.015), graphite);
+tCollar.position.y = 0.25;
+tSeg1.add(tCollar);
+cmc.add(tSeg1);
+
+const thumbIP = defineJoint('thumb_ip', ['x']);
+thumbIP.position.y = 0.50;
+cmc.add(thumbIP);
+thumbIP.add(hingeBarrel(0.062, 0.215, 0.26));
+const tSeg2 = new THREE.Group();
+tSeg2.rotation.y = TWIST;
+tSeg2.add(shellSeg(0.30, 0.190, 0.175, { round: 0.42, pad: true }));
+thumbIP.add(tSeg2);
+
+stage.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+
+/* ================================================================
+   FLOOR — faint mirror reflection · soft cyan glow · shadow catcher
+   ================================================================ */
+const FLOOR_Y = -1.68;
+
+function radialTexture(stops, size = 512) {
+  const c = document.createElement('canvas'); c.width = c.height = size;
+  const ctx = c.getContext('2d');
+  const g = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+  for (const [o, col] of stops) g.addColorStop(o, col);
+  ctx.fillStyle = g; ctx.fillRect(0, 0, size, size);
+  return new THREE.CanvasTexture(c);
+}
+
+const mirror = new Reflector(new THREE.CircleGeometry(3.4, 64), {
+  clipBias: 0.003, textureWidth: 1024, textureHeight: 1024, color: 0x2b2e33
+});
+mirror.rotation.x = -Math.PI / 2;
+mirror.position.y = FLOOR_Y;
+scene.add(mirror);
+
+// radial dark overlay: dims the mirror to a faint sheen + hides its edge
+const overlay = new THREE.Mesh(
+  new THREE.CircleGeometry(3.4, 64),
+  new THREE.MeshBasicMaterial({
+    map: radialTexture([[0,'rgba(13,14,16,0.60)'],[0.45,'rgba(13,14,16,0.80)'],[0.75,'rgba(13,14,16,0.97)'],[1,'rgba(13,14,16,1)']]),
+    transparent: true, depthWrite: false
+  }));
+overlay.rotation.x = -Math.PI / 2;
+overlay.position.y = FLOOR_Y + 0.004;
+overlay.renderOrder = 1;
+scene.add(overlay);
+
+const shadowCatcher = new THREE.Mesh(
+  new THREE.CircleGeometry(3.4, 64),
+  new THREE.ShadowMaterial({ opacity: 0.42 }));
+shadowCatcher.rotation.x = -Math.PI / 2;
+shadowCatcher.position.y = FLOOR_Y + 0.008;
+shadowCatcher.receiveShadow = true;
+shadowCatcher.renderOrder = 2;
+scene.add(shadowCatcher);
+
+// static soft cyan pool under the wrist — subtle, always on
+const glow = new THREE.Mesh(
+  new THREE.PlaneGeometry(3.1, 3.1),
+  new THREE.MeshBasicMaterial({
+    map: radialTexture([[0,'rgba(64,224,232,0.55)'],[0.4,'rgba(47,200,215,0.16)'],[1,'rgba(47,200,215,0)']], 256),
+    transparent: true, opacity: 0.30, blending: THREE.AdditiveBlending, depthWrite: false
+  }));
+glow.rotation.x = -Math.PI / 2;
+glow.position.set(-0.05, FLOOR_Y + 0.012, 0.05);
+glow.renderOrder = 3;
+scene.add(glow);
+
+// confidence readout: thin ring + tinted disc, hue red → green, opacity = value
+const confDisc = new THREE.Mesh(
+  new THREE.CircleGeometry(1.08, 48),
+  new THREE.MeshBasicMaterial({
+    map: radialTexture([[0,'rgba(255,255,255,0.85)'],[0.6,'rgba(255,255,255,0.28)'],[1,'rgba(255,255,255,0)']], 256),
+    transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false
+  }));
+confDisc.rotation.x = -Math.PI / 2;
+confDisc.position.y = FLOOR_Y + 0.016;
+confDisc.renderOrder = 4;
+scene.add(confDisc);
+
+const confRingMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
+const confRing = new THREE.Mesh(new THREE.TorusGeometry(1.18, 0.016, 10, 128), confRingMat);
+confRing.rotation.x = -Math.PI / 2;
+confRing.position.y = FLOOR_Y + 0.020;
+confRing.renderOrder = 5;
+scene.add(confRing);
+
+/* ================================================================
+   POSE LIBRARY — joint angles in DEGREES · flexion positive
+   ----------------------------------------------------------------
+   Channels (a bare number = primary axis):
+     wrist          x = palmarflex (+) / extension (−)
+                    z = radial deviation (+, toward thumb)
+     forearm_roll   y = pronation (+) / supination (−)
+     *_mcp          x = flexion,  z = abduction (+ toward thumb)
+     *_pip / *_dip  x = flexion
+     thumb_cmc      x = opposition flexion (curl toward index)
+                    z = palmar sweep (+ pushes tip forward/across)
+     thumb_ip       x = flexion
+   Unspecified channels default to 0. Values are FK-tuned so pinch and
+   tripod make real pad contact and the fist stays intersection-free.
+   ================================================================ */
+
+// relaxed resting curl — shared by the wrist-isolated poses
+const RELAXED = {
+  index_mcp:  { x: 14, z:  4 }, index_pip: 10, index_dip:  6,
+  middle_mcp: { x: 12, z:  1 }, middle_pip:  8, middle_dip:  5,
+  ring_mcp:   { x: 14, z: -3 }, ring_pip:   10, ring_dip:   6,
+  pinky_mcp:  { x: 22, z: -8 }, pinky_pip:  14, pinky_dip:  9,
+  thumb_cmc:  { x:  8, z: 12 }, thumb_ip:    8,
+};
+
+const POSES = {
+
+  /* 01 — open rest: gentle fan, soft mechanical curl */
+  neutral: { wrist: 0, forearm_roll: 0, ...RELAXED },
+
+  /* 02 — power fist: fingers 90/100/60 (compact block), thumb wraps
+          low across the front of the finger stack */
+  fist: {
+    wrist: 0, forearm_roll: 0,
+    index_mcp:  { x: 90, z: 0 }, index_pip: 100, index_dip: 60,
+    middle_mcp: { x: 90, z: 0 }, middle_pip: 100, middle_dip: 60,
+    ring_mcp:   { x: 90, z: 0 }, ring_pip: 100,  ring_dip: 60,
+    pinky_mcp:  { x: 90, z: 0 }, pinky_pip: 100, pinky_dip: 60,
+    thumb_cmc:  { x: 60, z: 20 }, thumb_ip: 46,
+  },
+
+  /* 03 — index extended straight, others fisted, thumb tucked under */
+  index_point: {
+    wrist: 0, forearm_roll: 0,
+    index_mcp:  { x:  3, z: 2 }, index_pip:  3, index_dip:  2,
+    middle_mcp: { x: 85, z: 0 }, middle_pip: 95, middle_dip: 55,
+    ring_mcp:   { x: 88, z: 0 }, ring_pip:  98, ring_dip: 58,
+    pinky_mcp:  { x: 85, z: 0 }, pinky_pip: 95, pinky_dip: 55,
+    thumb_cmc:  { x: 42, z: 10 }, thumb_ip: 46,
+  },
+
+  /* 04 — tip pinch: index pad and thumb pad meet (FK-verified contact) */
+  pinch: {
+    wrist: 0, forearm_roll: 0,
+    index_mcp:  { x: 60, z: 2 }, index_pip: 68, index_dip: 25,
+    middle_mcp: { x: 70, z: 0 }, middle_pip: 76, middle_dip: 44,
+    ring_mcp:   { x: 74, z: -2 }, ring_pip: 80, ring_dip: 46,
+    pinky_mcp:  { x: 76, z: -4 }, pinky_pip: 82, pinky_dip: 48,
+    thumb_cmc:  { x: 42, z: 2 }, thumb_ip: 60,
+  },
+
+  /* 05 — tripod / pen grip: thumb·index·middle tips converge on a
+          point; slight radial wrist deviation like a real pen hold */
+  tripod: {
+    wrist: { x: 2, z: 5 }, forearm_roll: 0,
+    index_mcp:  { x: 64, z: 2 }, index_pip: 70, index_dip: 26,
+    middle_mcp: { x: 64, z: 0 }, middle_pip: 68, middle_dip: 24,
+    ring_mcp:   { x: 60, z: -2 }, ring_pip: 64, ring_dip: 30,
+    pinky_mcp:  { x: 66, z: -5 }, pinky_pip: 68, pinky_dip: 34,
+    thumb_cmc:  { x: 40, z: 6 }, thumb_ip: 48,
+  },
+
+  /* 06 — palmarflexion: wrist folds toward the palm */
+  wrist_flex: { wrist: { x: 55 }, forearm_roll: 0, ...RELAXED },
+
+  /* 07 — wrist extension, slight tenodesis coil in the fingers */
+  wrist_extend: {
+    wrist: { x: -48 }, forearm_roll: 0,
+    index_mcp:  { x: 16, z:  4 }, index_pip: 18, index_dip: 10,
+    middle_mcp: { x: 14, z:  1 }, middle_pip: 16, middle_dip:  9,
+    ring_mcp:   { x: 16, z: -3 }, ring_pip:  17, ring_dip: 10,
+    pinky_mcp:  { x: 22, z: -8 }, pinky_pip: 20, pinky_dip: 12,
+    thumb_cmc:  { x:  6, z: 10 }, thumb_ip:   8,
+  },
+
+  /* 08 — pronation: thumb side rolls anteriorly (+85° about Y) */
+  pronation: { wrist: 0, forearm_roll: 85, ...RELAXED },
+
+  /* 09 — supination: reverse roll (−85°) */
+  supination: { wrist: 0, forearm_roll: -85, ...RELAXED },
+};
+
+/* ================================================================
+   POSE ENGINE — normalize · 250 ms ease-in-out blend · queue-safe
+   ================================================================ */
+const BLEND_S = 0.25;
+
+function normalizePose(p) {
+  const out = {};
+  for (const jn in jointDefs) {
+    for (const ax of jointDefs[jn].order) {
+      const v = p[jn];
+      let val = 0;
+      if (typeof v === 'number') val = v;
+      else if (v && typeof v === 'object') val = (ax === 'x' ? (v.x ?? 0) : ax === 'y' ? (v.y ?? 0) : (v.z ?? 0));
+      out[jn + '.' + ax] = val;
+    }
+  }
+  return out;
+}
+
+const state = { channels: normalizePose(POSES.neutral) };
+let activePoseName = 'neutral';
+let blend = null;                 // a new setPose overwrites this → queue-safe
+let tNow = 0;
+
+const _q = new THREE.Quaternion(), _q2 = new THREE.Quaternion();
+
+// Apply channels with idle tremor: ±1.0° sine at ~2 Hz (±0.45° on
+// secondary axes), phase-shifted per joint so it never looks looped.
+function applyRig(ch, t) {
+  for (const name in jointDefs) {
+    const def = jointDefs[name], g = joints[name];
+    _q.copy(def.base);
+    for (const ax of def.order) {
+      let deg = ch[name + '.' + ax] || 0;
+      deg += (ax === 'x' ? 1.0 : 0.45) * Math.sin(t * TAU * 2.0 + def.phase + (ax === 'z' ? 1.3 : 0));
+      _q2.setFromAxisAngle(AX[ax], deg * DEG);
+      _q.multiply(_q2);
+    }
+    g.quaternion.copy(_q);
+  }
+}
+
+/* ================================================================
+   window.HandRig — public API (stable contract)
+   ================================================================ */
+let confTarget = 0.75, conf = 0;
+let actTarget = 0, act = 0;
+let debugUI = false;
+
+window.HandRig = {
+  poses: Object.keys(POSES),   // exact validation list
+  joints,                      // live THREE.Group pivot registry
+  POSES,
+
+  // Smooth 250 ms ease-in-out blend to a named pose.
+  // Queue-safe: a new call cancels the in-flight blend from its
+  // current interpolated state (no snapping).
+  setPose(name) {
+    if (!POSES[name]) { console.warn(`[HandRig] unknown pose "${name}"`); return false; }
+    blend = { from: { ...state.channels }, to: normalizePose(POSES[name]), t0: tNow };
+    activePoseName = name;
+    return true;
+  },
+
+  // Direct control of one joint's primary axis. Optional 3rd arg
+  // selects the axis: setJoint('wrist',-10,'z'), setJoint('forearm_roll',45,'y').
+  // Cancels any in-flight blend — manual control wins.
+  setJoint(name, deg, axis) {
+    const def = jointDefs[name];
+    if (!def) { console.warn(`[HandRig] unknown joint "${name}"`); return false; }
+    const ax = (axis && def.order.includes(axis)) ? axis : def.order[0];
+    blend = null;
+    state.channels[name + '.' + ax] = deg;
+    activePoseName = null;                    // rig is now in a custom state
+    return true;
+  },
+
+  // Confidence ring under the hand: opacity = value, hue red → green.
+  setConfidence(v) { confTarget = THREE.MathUtils.clamp(v, 0, 1); },
+
+  // Emissive pulse on cuff emitter strip + palm core, 0..1.
+  setActivation(v) { actTarget = THREE.MathUtils.clamp(v, 0, 1); },
+
+  // Current pose name, or null after setJoint() (custom state).
+  getPose() { return activePoseName; },
+
+  // Show / hide the dev panel. Called with no argument it toggles.
+  setDebugUI(visible) {
+    debugUI = (typeof visible === 'boolean') ? visible : !debugUI;
+    document.body.classList.toggle('debug', debugUI);
+    return debugUI;
+  },
+};
+
+console.log('%c HandRig %c ready → ' + window.HandRig.poses.join(', '),
+            'background:#35dbe8;color:#06272b;font-weight:bold;padding:2px 6px', 'color:#35dbe8');
+
+/* ================================================================
+   DEBUG PANEL WIRING
+   ================================================================ */
+const $ = id => document.getElementById(id);
+const capPose = $('capPose'), capMeta = $('capMeta'), capDot = $('capDot');
+const cycleBtn = $('cycleBtn'), turnBtn = $('turnBtn');
+
+const SHORT = {
+  neutral: 'neutral', fist: 'fist', index_point: 'index', pinch: 'pinch',
+  tripod: 'tripod', wrist_flex: 'w·flex', wrist_extend: 'w·ext',
+  pronation: 'pronate', supination: 'supinate',
+};
+
+let cycleOn = false, turnOn = false, cycleAnchor = 0;
+
+window.HandRig.poses.forEach((p, i) => {
+  const b = document.createElement('button');
+  b.className = 'pose';
+  b.dataset.pose = p;
+  b.title = p;
+  b.innerHTML = `<small>${String(i + 1).padStart(2, '0')}</small><span>${SHORT[p]}</span>`;
+  b.addEventListener('click', () => { window.HandRig.setPose(p); cycleAnchor = tNow; });
+  $('poseButtons').appendChild(b);
+});
+
+cycleBtn.addEventListener('click', () => {
+  cycleOn = !cycleOn;
+  cycleBtn.classList.toggle('on', cycleOn);
+  if (cycleOn) cycleAnchor = tNow;
+});
+turnBtn.addEventListener('click', () => {
+  turnOn = !turnOn;
+  turnBtn.classList.toggle('on', turnOn);
+});
+
+ $('confSlider').addEventListener('input', e => {
+  window.HandRig.setConfidence(e.target.value / 100);
+  $('confVal').textContent = (e.target.value / 100).toFixed(2);
+});
+ $('actSlider').addEventListener('input', e => {
+  window.HandRig.setActivation(e.target.value / 100);
+  $('actVal').textContent = (e.target.value / 100).toFixed(2);
+});
+
+addEventListener('keydown', e => {
+  if (e.key >= '1' && e.key <= '9') {
+    const p = window.HandRig.poses[+e.key - 1];
+    if (p) { window.HandRig.setPose(p); cycleAnchor = tNow; }
+  }
+  else if (e.key === 'c' || e.key === 'C') cycleBtn.click();
+  else if (e.key === 't' || e.key === 'T') turnBtn.click();
+  else if (e.key === 'd' || e.key === 'D') window.HandRig.setDebugUI();
+});
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.fov = camera.aspect >= 1.1 ? 40 : Math.min(66, 40 / camera.aspect);
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+/* ================================================================
+   MAIN LOOP
+   ================================================================ */
+const clock = new THREE.Clock();
+const ringColor = new THREE.Color();
+let capCache = '', metaCache = '';
+
+function refreshButtons() {
+  document.querySelectorAll('button.pose').forEach(b =>
+    b.classList.toggle('active', b.dataset.pose === activePoseName));
+}
+
+renderer.setAnimationLoop(() => {
+  const dt = Math.min(clock.getDelta(), 0.05);
+  tNow += dt;
+
+  // --- 250 ms cubic ease-in-out pose blending ---
+  if (blend) {
+    const u = Math.min(1, (tNow - blend.t0) / BLEND_S);
+    const e = u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+    for (const k in blend.to) state.channels[k] = blend.from[k] + (blend.to[k] - blend.from[k]) * e;
+    if (u >= 1) blend = null;
+  }
+  applyRig(state.channels, tNow);
+
+  // --- activation: smoothed target + subtle myo flicker ---
+  act += (actTarget - act) * Math.min(1, dt * 7);
+  const flick = 1 + 0.10 * Math.sin(tNow * 5.3);
+  ledStrip.emissiveIntensity = (0.55 + act * 2.4) * flick;
+  ledCyan.emissiveIntensity  = (0.85 + act * 1.7) * flick;
+  ledCollar.emissiveIntensity = (0.40 + act * 2.0) * flick;
+  emitterLight.intensity = act * 3.5;
+
+  // --- confidence ring: red → green hue ramp, opacity = value ---
+  conf += (confTarget - conf) * Math.min(1, dt * 9);
+  ringColor.setHSL(0.34 * conf, 0.80, 0.55);
+  confRingMat.color.copy(ringColor);
+  confDisc.material.color.copy(ringColor);
+  confRingMat.opacity = conf * 0.85;
+  confDisc.material.opacity = conf * 0.22;
+  confRing.visible = confDisc.visible = conf > 0.015;
+  const pulse = 1 + 0.02 * Math.sin(tNow * 2.4);
+  confRing.scale.setScalar(pulse);
+  confDisc.scale.setScalar(pulse);
+
+  // --- static cyan floor pool: gentle breathing ---
+  glow.material.opacity = 0.26 + 0.05 * Math.sin(tNow * 1.1);
+
+  // --- turntable / auto-cycle ---
+  if (turnOn) stage.rotation.y += dt * 0.45;
+  if (cycleOn && tNow - cycleAnchor > 2.8) {
+    cycleAnchor = tNow;
+    const list = window.HandRig.poses;
+    window.HandRig.setPose(list[(list.indexOf(activePoseName) + 1 + list.length) % list.length]);
+  }
+
+  // --- minimal caption (always-on HUD) ---
+  const poseTxt = activePoseName ?? 'custom';
+  if (poseTxt !== capCache) { capPose.textContent = poseTxt; capCache = poseTxt; refreshButtons(); }
+  const metaTxt = `confidence ${conf.toFixed(2)} · activation ${act.toFixed(2)}`;
+  if (metaTxt !== metaCache) { capMeta.textContent = metaTxt; metaCache = metaTxt; }
+  capDot.style.opacity = (0.35 + act * 0.65).toFixed(2);
+
+  controls.update();
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>

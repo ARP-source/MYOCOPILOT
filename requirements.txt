@@ -1,0 +1,13 @@
+numpy
+scipy
+h5py
+pandas
+matplotlib
+pillow
+scikit-learn
+fastapi
+uvicorn[standard]
+websockets
+httpx
+python-dotenv
+pytest
