@@ -1,5 +1,5 @@
 """
-myosignal.player — SessionPlayer: real-time sEMG replay with drift injection.
+myosignal.player, SessionPlayer: real-time sEMG replay with drift injection.
 
 Usage
 -----
@@ -59,7 +59,7 @@ DATA_DIR = Path("data")
 # myosignal.drift.inject_drift's 'electrode_shift' (a 2-channel swap + a
 # 2-channel gain cut) models a mild, localized shift. This transform instead
 # models a severe full electrode-cap remap: every one of the 12 channels is
-# displaced to a different physical position (a fixed derangement — no
+# displaced to a different physical position (a fixed derangement, no
 # channel maps to itself), rescaled by a fixed per-channel gain, given a
 # small channel-dependent baseline-wander/contact-noise artifact, and two
 # channels additionally lose most contact. Unlike inject_drift's other modes
@@ -67,7 +67,7 @@ DATA_DIR = Path("data")
 # transform and still goes through inject_drift as before.
 #
 # Every parameter below is a fixed constant (no external RNG, no session
-# seed) so the transform is fully deterministic on its own — the same input
+# seed) so the transform is fully deterministic on its own, the same input
 # window always produces the same output.
 
 # Derangement of channel indices 0-11: perm[i] = (5*i + 3) mod 12. gcd(5,12)=1
@@ -90,13 +90,13 @@ _ELECTRODE_SHIFT_CONTACT_LOSS_GAIN = 0.12
 _ELECTRODE_SHIFT_WANDER_HZ = 0.8
 _ELECTRODE_SHIFT_WANDER_AMPLITUDE = 0.8
 _ELECTRODE_SHIFT_NOISE_AMPLITUDE = 1.5
-_ELECTRODE_SHIFT_NOISE_SEED = 20260831  # fixed — independent of session/subject seed
+_ELECTRODE_SHIFT_NOISE_SEED = 20260831  # fixed, independent of session/subject seed
 
 
 def apply_electrode_shift_stress(window: np.ndarray, fs: int) -> np.ndarray:
     """
     Apply the severe, deterministic electrode-placement-shift stress
-    transform to one preprocessed sEMG window — see the module comment
+    transform to one preprocessed sEMG window, see the module comment
     above _ELECTRODE_SHIFT_PERMUTATION.
 
     Parameters
@@ -118,7 +118,7 @@ def apply_electrode_shift_stress(window: np.ndarray, fs: int) -> np.ndarray:
     # 2. Fixed per-channel gain (0.45x-1.70x).
     out *= _ELECTRODE_SHIFT_GAIN[:n_ch]
 
-    # 3. Small channel-dependent baseline wander + contact noise — fully
+    # 3. Small channel-dependent baseline wander + contact noise, fully
     #    self-seeded so this step alone is deterministic regardless of caller state.
     rng = np.random.default_rng(_ELECTRODE_SHIFT_NOISE_SEED)
     t = np.arange(n_t, dtype=np.float32) / fs
@@ -361,7 +361,7 @@ class SessionPlayer:
             window = batch.window
             if self._drift_mode is not None:
                 if self._drift_mode == "electrode_shift":
-                    # Severe, deterministic whole-array electrode-cap remap —
+                    # Severe, deterministic whole-array electrode-cap remap,
                     # see apply_electrode_shift_stress's module comment.
                     window = apply_electrode_shift_stress(window, fs)
                 else:

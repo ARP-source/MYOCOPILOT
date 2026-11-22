@@ -1,8 +1,8 @@
 """
-myosignal.preprocess — signal conditioning for raw sEMG.
+myosignal.preprocess, signal conditioning for raw sEMG.
 
 Pipeline (applied in order):
-    1. 4th-order Butterworth bandpass  20–450 Hz  (filtfilt, zero phase)
+    1. 4th-order Butterworth bandpass  20-450 Hz  (filtfilt, zero phase)
     2. Optional 60 Hz notch            (IIR notch, filtfilt)
     3. Per-channel z-score normalisation using the first *baseline_s* seconds
        as the reference distribution.
@@ -99,7 +99,7 @@ def compute_baseline_stats(
 
     Returns
     -------
-    (mean, std) — each float32 array of shape (n_channels,).
+    (mean, std), each float32 array of shape (n_channels,).
     std values of zero are replaced with 1.0 to avoid division by zero.
     """
     n_baseline = min(int(baseline_s * fs), emg.shape[0])
@@ -148,7 +148,7 @@ def preprocess(
 
     Steps
     -----
-    1. 4th-order Butterworth bandpass 20–450 Hz (filtfilt).
+    1. 4th-order Butterworth bandpass 20-450 Hz (filtfilt).
     2. (Optional) 60 Hz notch (filtfilt).
     3. Per-channel z-score using the first *baseline_s* seconds as reference.
 
@@ -164,8 +164,8 @@ def preprocess(
     -------
     (emg_clean, baseline_mean, baseline_std)
         emg_clean     : preprocessed float32 array (n_samples, n_channels).
-        baseline_mean : float32 array (n_channels,) — for downstream use.
-        baseline_std  : float32 array (n_channels,) — for downstream use.
+        baseline_mean : float32 array (n_channels,), for downstream use.
+        baseline_std  : float32 array (n_channels,), for downstream use.
     """
     emg_f = bandpass_filter(emg, fs)
     if notch:

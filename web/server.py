@@ -1,5 +1,5 @@
 """
-web.server — FastAPI application.
+web.server, FastAPI application.
 
 Endpoints
 ---------
@@ -32,7 +32,7 @@ app = FastAPI(title="MyoCopilot API")
 DEFAULT_SUBJECT = "DB2_s1"
 ENVELOPE_QUEUE_MAXSIZE = 5
 
-# Single active session — this demo serves one live dashboard at a time.
+# Single active session, this demo serves one live dashboard at a time.
 _current_session: Optional[Session] = None
 
 

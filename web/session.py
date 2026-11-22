@@ -1,5 +1,5 @@
 """
-web.session — per-WebSocket-connection state.
+web.session, per-WebSocket-connection state.
 
 Each connected client gets its own Session object that tracks classification
 history, the active DriftDetector, and a CostTracker.

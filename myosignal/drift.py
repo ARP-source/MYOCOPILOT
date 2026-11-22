@@ -1,5 +1,5 @@
 """
-myosignal.drift — deterministic electrode-artefact injection for sEMG windows.
+myosignal.drift, deterministic electrode-artefact injection for sEMG windows.
 
 Three drift modes (all deterministic given the same seed):
 
@@ -34,7 +34,7 @@ DriftMode = Literal["electrode_shift", "sweat", "channel_swap"]
 
 def _electrode_shift(window: np.ndarray, rng: np.random.Generator) -> np.ndarray:
     """
-    Permute channels 3 ↔ 7 and apply 0.7 gain on channels 1–2.
+    Permute channels 3 ↔ 7 and apply 0.7 gain on channels 1-2.
 
     Parameters
     ----------
@@ -89,12 +89,12 @@ def _sweat(
     # Scale factor: linearly ramps from 0 at t=0 to 1 at t=60 s, then capped
     scale = min(elapsed_s / 60.0, 1.0)
 
-    # Broadband noise floor — same amplitude on every channel
+    # Broadband noise floor, same amplitude on every channel
     noise_amp = scale * 0.15 * float(np.std(out) + 1e-8)
     noise = rng.standard_normal(out.shape).astype(np.float32) * noise_amp
     out += noise
 
-    # Slow baseline wander (0.5 Hz sinusoid) — correlated across channels
+    # Slow baseline wander (0.5 Hz sinusoid), correlated across channels
     t = np.arange(n_t, dtype=np.float32) / fs
     # Phase offset determined by elapsed_s so the wander is continuous
     wander_amp = scale * 0.08 * float(np.std(out) + 1e-8)
@@ -112,7 +112,7 @@ def _channel_swap(window: np.ndarray, rng: np.random.Generator) -> np.ndarray:
     Parameters
     ----------
     window : float32 array (n_samples, n_channels).
-    rng    : numpy random generator (unused — kept for API consistency).
+    rng    : numpy random generator (unused, kept for API consistency).
 
     Returns
     -------

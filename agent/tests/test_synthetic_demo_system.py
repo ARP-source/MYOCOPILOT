@@ -2,7 +2,7 @@
 System-level tests: the REAL myosignal.loaders.make_synthetic_session
 structured synthetic signal, segmented through myosignal.windows, classified
 end-to-end by agent.mock_classifier, with myosignal.player's severe
-electrode-shift stress transform for drift — no controlled/hand-built
+electrode-shift stress transform for drift, no controlled/hand-built
 fixtures. This is the "does the actual demo story hold up" complement to
 agent/tests/test_mock_classifier.py's controlled-fixture unit tests.
 
@@ -68,7 +68,7 @@ class TestCleanSyntheticSession:
 
             if not warm:
                 # Only monitor for drift once bootstrap has actually
-                # finished — mirrors eval.demo.py / eval.run.py's own
+                # finished, mirrors eval.demo.py / eval.run.py's own
                 # pattern of not judging the classifier's forced warm-up
                 # guesses as if they were live, calibrated predictions.
                 detector.update(true_g, pred)

@@ -1,5 +1,5 @@
 """
-agent.cost_tracker — token counting and USD cost accounting.
+agent.cost_tracker, token counting and USD cost accounting.
 
 Tracks cumulative token usage and estimated API cost across all OpenRouter
 calls in a session.  Cost per token is configurable to match the model's
@@ -15,7 +15,7 @@ COST_PER_OUTPUT_TOKEN_USD: float = 0.015 / 1_000_000
 
 class CostTracker:
     """
-    Thread-safe (via simple attribute updates — single-threaded async context)
+    Thread-safe (via simple attribute updates, single-threaded async context)
     cumulative cost and token counter for one session.
     """
 

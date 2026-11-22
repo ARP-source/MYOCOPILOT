@@ -1,5 +1,5 @@
 """
-myosignal.loaders — load raw sEMG from NinaPro DB2 (.mat) and Meta emg2pose (.h5/.hdf5).
+myosignal.loaders, load raw sEMG from NinaPro DB2 (.mat) and Meta emg2pose (.h5/.hdf5).
 
 Both loaders introspect the file structure at runtime rather than hard-coding key names.
 
@@ -29,7 +29,7 @@ from typing import Optional
 import numpy as np
 
 # ---------------------------------------------------------------------------
-# Contract constant — all sources are normalised to this channel count.
+# Contract constant, all sources are normalised to this channel count.
 # ---------------------------------------------------------------------------
 N_CHANNELS: int = 12
 
@@ -113,7 +113,7 @@ def _normalise_channels(emg: np.ndarray) -> np.ndarray:
     """Truncate or zero-pad the channel axis to exactly N_CHANNELS."""
     emg = np.atleast_2d(emg)
     if emg.shape[0] < emg.shape[1]:
-        # shape might be (channels, samples) — transpose
+        # shape might be (channels, samples), transpose
         if emg.shape[0] in (12, 16, 8, 4):
             emg = emg.T
     n = emg.shape[1]
@@ -147,7 +147,7 @@ def load_ninapro(
     """
     Load a NinaPro DB2 .mat exercise file.
 
-    Keys are discovered at runtime — no assumptions about variable names.
+    Keys are discovered at runtime, no assumptions about variable names.
 
     Parameters
     ----------
@@ -292,7 +292,7 @@ def load_emg2pose(
         shape = obj.shape
         if len(shape) != 2:
             return
-        # Match (N, 16) or (16, N) — emg2pose has 16 channels
+        # Match (N, 16) or (16, N), emg2pose has 16 channels
         if 16 in shape and max(shape) > 16:
             arr = obj[:]
             if arr.shape[1] != 16:
@@ -386,7 +386,7 @@ def load_emg2pose(
 # engineered "structured EMG-like synthetic signals": each POSE_SET gesture
 # (other than 'neutral') gets a fixed, overlapping-but-distinct 12-channel
 # relative activation "signature" below, so per-channel RMS and zero-crossing
-# features can actually separate gestures — instead of every gesture being
+# features can actually separate gestures, instead of every gesture being
 # channel-identical IID noise that differs only by a random per-burst
 # amplitude scale (the previous behavior, which gave clean synthetic sessions
 # weak gesture separability regardless of classifier quality).
@@ -436,7 +436,7 @@ def _synthetic_seed(subject: str, seed: int) -> int:
 
     The same (subject, seed) pair always reproduces byte-identical output
     (satisfying make_synthetic_session's determinism contract), while
-    different subjects get distinct — but still fully deterministic —
+    different subjects get distinct, but still fully deterministic,
     per-subject channel gains and noise draws. zlib.crc32 is used rather
     than Python's built-in hash() because str hashing is randomized per
     process unless PYTHONHASHSEED is fixed, which would break reproducibility.
@@ -455,7 +455,7 @@ def make_synthetic_session(
     Generate a reproducible, structured EMG-like synthetic sEMG session for
     tests and demos.
 
-    NOT a clinical or biomechanical simulation — see the module-level
+    NOT a clinical or biomechanical simulation, see the module-level
     comment above _SYNTHETIC_GESTURE_SIGNATURES. Each active POSE_SET
     gesture is given a fixed, deliberately overlapping-but-distinct
     12-channel relative activation signature (e.g. 'fist' activates channels
@@ -474,20 +474,20 @@ def make_synthetic_session(
       - a per-repetition amplitude and phase jitter, so repeated instances
         of the same gesture are similar but not identical.
 
-    'neutral' is low-amplitude filtered noise only — both during its own
+    'neutral' is low-amplitude filtered noise only, both during its own
     rest periods between bursts and as the resting baseline under every
     active burst.
 
     Burst schedule: one round-robin "diversity lap" through all 8 active
     POSE_SET gestures (in POSE_SET order, each rep separated by a 'neutral'
-    rest) — so a consumer that bootstraps a feature normalization/scaling
+    rest), so a consumer that bootstraps a feature normalization/scaling
     step from the first several clean, labeled windows sees every gesture
     type at least once, instead of calibrating against just the first one
     or two gesture types it happens to see repeated. That's followed by
     _SYNTHETIC_BOOTSTRAP_TOPUP_REPS extra repetitions of just the first
     gesture (quickly giving it, and 'neutral', a stable few-shot count),
     then an indefinite round-robin cycle through all 8 for the rest of the
-    session's duration — for ongoing session dynamics (drift injection,
+    session's duration, for ongoing session dynamics (drift injection,
     recalibration against an already-known gesture).
 
     Parameters
@@ -496,8 +496,8 @@ def make_synthetic_session(
     fs        : sampling rate in Hz.
     subject   : subject identifier. Also seeds a fixed per-subject,
                 per-channel gain (see _synthetic_seed), so different subjects
-                produce different — but each internally deterministic and
-                reproducible — signals for the same *seed*.
+                produce different, but each internally deterministic and
+                reproducible, signals for the same *seed*.
     seed      : RNG seed for reproducibility. The same (subject, seed) pair
                 always yields a numerically identical session.
     """
@@ -529,7 +529,7 @@ def make_synthetic_session(
 
     # Schedule: one diversity lap (all 8, interleaved) + a quick top-up of
     # the first gesture, then an indefinite round-robin cycle for the rest
-    # of the session's duration — see the docstring's "Burst schedule"
+    # of the session's duration, see the docstring's "Burst schedule"
     # section. The indefinite cycle (rather than a fixed number of extra
     # laps) means the ratio of the bootstrap-only prefix to the whole
     # session shrinks as n_seconds grows, instead of a fixed-length

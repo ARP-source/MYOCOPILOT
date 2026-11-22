@@ -1,7 +1,7 @@
-# MyoCopilot — demo orchestration.
+# MyoCopilot, demo orchestration.
 #
 # GNU Make on Windows (Git Bash / WSL / choco make) can run this directly.
-# If `make` isn't available, use the PowerShell equivalents in scripts/ —
+# If `make` isn't available, use the PowerShell equivalents in scripts/,
 # e.g. `.\scripts\demo.ps1` instead of `make demo`. See README.md.
 
 .PHONY: setup test backend frontend demo eval report
@@ -21,7 +21,7 @@ backend:
 frontend:
 	cd frontend && npm run dev
 
-# Headless, deterministic, MOCK=1 — no browser, no API key. See eval/demo.py.
+# Headless, deterministic, MOCK=1, no browser, no API key. See eval/demo.py.
 demo:
 	MOCK=1 py -m eval.demo
 

@@ -1,10 +1,10 @@
 """
-serve — production ASGI entrypoint for Docker / Zeabur.
+serve, production ASGI entrypoint for Docker / Zeabur.
 
 Imports the existing FastAPI app from web.server UNCHANGED and mounts the
 built React frontend (frontend/dist/) onto it as a catch-all static route,
 so one process on one port serves both the API/WebSocket and the dashboard.
-web/server.py itself is never edited — the mount is attached here, from
+web/server.py itself is never edited, the mount is attached here, from
 outside, onto the same `app` object, after its own routes (/stream,
 /history, /stats) are already registered, so those still take priority and
 everything else falls through to the SPA's static files.

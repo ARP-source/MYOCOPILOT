@@ -1,5 +1,5 @@
 """
-eval.baselines — honest classical baseline: k-NN on RMS features.
+eval.baselines, honest classical baseline: k-NN on RMS features.
 
 Trains a small k-nearest-neighbours classifier (scikit-learn) on each
 subject's first two repetitions using the 12-channel RMS feature vector
@@ -13,7 +13,7 @@ This is a sanity-check baseline, not a competitor: it exists so nobody can
 claim MyoCopilot's numbers "beat" a classifier without a classical baseline
 sitting next to them. Nothing here is validated against real clinical data,
 and neither this baseline nor MyoCopilot's mock/agent path should be read as
-clinically meaningful — see the data_source column.
+clinically meaningful, see the data_source column.
 
 Run with:
     python -m eval.baselines
@@ -99,7 +99,7 @@ def run() -> dict:
 
     return {
         "note": (
-            "Sanity-check baseline only — not a claim of clinical accuracy or of "
+            "Sanity-check baseline only, not a claim of clinical accuracy or of "
             "superiority over the classical k-NN method. Compare only within the "
             "same data_source; synthetic_demo_data rows are not real EMG."
         ),

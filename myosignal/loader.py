@@ -1,5 +1,5 @@
 """
-myosignal.loader — load raw sEMG data from NinaPro DB2 (.mat) and
+myosignal.loader, load raw sEMG data from NinaPro DB2 (.mat) and
 Meta emg2pose mini (.hdf5) datasets into a common numpy array format.
 """
 

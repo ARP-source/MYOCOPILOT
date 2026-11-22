@@ -15,7 +15,7 @@ DURATION_S = 5   # short enough to be fast in CI
 
 @pytest.fixture(scope="session")
 def raw_session() -> RawSession:
-    """5-second synthetic RawSession — shared across all tests in the session."""
+    """5-second synthetic RawSession, shared across all tests in the session."""
     return make_synthetic_session(n_seconds=DURATION_S, fs=FS, subject="test", seed=42)
 
 

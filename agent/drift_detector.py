@@ -1,5 +1,5 @@
 """
-agent.drift_detector — rolling accuracy monitoring and drift heuristics.
+agent.drift_detector, rolling accuracy monitoring and drift heuristics.
 
 Maintains a sliding window of recent (true_gesture, predicted_gesture) pairs
 and raises a drift alert when rolling accuracy falls below a threshold or when
@@ -52,7 +52,7 @@ class DriftDetector:
         self._recent_confidence: deque[float] = deque(maxlen=window_size)
 
         # Running mean/variance of confidence over every window seen so far
-        # (Welford's online algorithm) — the "baseline" the rolling window is
+        # (Welford's online algorithm), the "baseline" the rolling window is
         # compared against.
         self._conf_n = 0
         self._conf_mean = 0.0
@@ -141,7 +141,7 @@ class DriftDetector:
     def drift_suspected(self) -> bool:
         """True when accuracy or confidence signals indicate drift (ignoring debounce).
 
-        Accuracy-based drift requires a full window of labeled predictions —
+        Accuracy-based drift requires a full window of labeled predictions,
         otherwise a single early misclassification (e.g. 0/1) would trigger
         drift immediately.
         """

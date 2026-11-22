@@ -330,7 +330,7 @@ class TestPublicStreamAPI:
         assert "spectrogram_png_b64" in env
 
     def test_stream_signature_matches_contract(self):
-        """stream(subject, drift_at_s) — positional args work."""
+        """stream(subject, drift_at_s), positional args work."""
         from myosignal import stream
         import inspect
         sig = inspect.signature(stream)

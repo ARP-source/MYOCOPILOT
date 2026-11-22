@@ -21,8 +21,8 @@ POSE_SET: list[str] = [
 class WindowFeatures(TypedDict):
     """Per-channel features extracted from a 200 ms window."""
 
-    rms: list[float]            # length 12 — one per sEMG channel
-    zero_crossings: list[int]   # length 12 — one per sEMG channel
+    rms: list[float]            # length 12, one per sEMG channel
+    zero_crossings: list[int]   # length 12, one per sEMG channel
 
 
 class WindowEnvelope(TypedDict):

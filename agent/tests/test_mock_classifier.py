@@ -1,5 +1,5 @@
 """
-Tests for agent.mock_classifier — deterministic per-subject bootstrap,
+Tests for agent.mock_classifier, deterministic per-subject bootstrap,
 nearest-prototype inference that never echoes true_gesture, drift
 sensitivity, and profile-replacing recalibration.
 
@@ -7,7 +7,7 @@ Feature vectors here are hand-constructed with a clear, controlled
 per-gesture signature (small deterministic noise) rather than reusing
 myosignal's own synthetic EMG generator, whose gesture bursts carry no
 real per-channel spatial signal beyond a per-burst random amplitude scale
-(see eval/run.py's own honest accuracy numbers) — this isolates and proves
+(see eval/run.py's own honest accuracy numbers), this isolates and proves
 the classifier's *logic* against a signal that actually has the separation
 the design assumes, mirroring test_session_pipeline.py's existing
 precedent of exercising agent's contract-level behavior directly rather
@@ -104,7 +104,7 @@ class TestBootstrap:
         mock_classifier.reset_subject(subject)
         _bootstrap(subject, gestures=("neutral", "fist"))
 
-        # "supination" was never bootstrapped/enrolled — even when it is the
+        # "supination" was never bootstrapped/enrolled, even when it is the
         # true label, the classifier cannot echo it; it can only ever return
         # a gesture it has actually enrolled reference examples for.
         result = _classify(_envelope("supination", 999, subject, signature=_SIGNATURES["fist"]))
@@ -114,7 +114,7 @@ class TestBootstrap:
 
 
 # ---------------------------------------------------------------------------
-# Acceptance criterion 1 — clean session accuracy/confidence, no premature recal
+# Acceptance criterion 1, clean session accuracy/confidence, no premature recal
 # ---------------------------------------------------------------------------
 
 class TestCleanSession:
@@ -146,7 +146,7 @@ class TestCleanSession:
 
 
 # ---------------------------------------------------------------------------
-# Acceptance criterion 2 — electrode-shift-style drift drops accuracy,
+# Acceptance criterion 2, electrode-shift-style drift drops accuracy,
 # DriftDetector triggers only after injection, debounce respected
 # ---------------------------------------------------------------------------
 
@@ -191,7 +191,7 @@ class TestDriftInjection:
 
 
 # ---------------------------------------------------------------------------
-# Acceptance criterion 3 — recalibration recovers accuracy
+# Acceptance criterion 3, recalibration recovers accuracy
 # ---------------------------------------------------------------------------
 
 class TestRecalibrationRecovery:

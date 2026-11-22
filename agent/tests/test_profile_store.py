@@ -1,5 +1,5 @@
 """
-Tests for agent.profile_store — load/save round-trip and example eviction.
+Tests for agent.profile_store, load/save round-trip and example eviction.
 """
 
 from __future__ import annotations

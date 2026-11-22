@@ -1,5 +1,5 @@
 """
-Tests for agent.classifier — JSON extraction, response coercion, the
+Tests for agent.classifier, JSON extraction, response coercion, the
 mocked-network happy path, retry-then-succeed, and the hard-failure fallback.
 """
 
@@ -27,7 +27,7 @@ class TestExtractJson:
         assert classifier._extract_json(text) == {"gesture": "fist", "confidence": 0.9}
 
     def test_json_with_surrounding_prose(self):
-        text = 'Sure, here you go: {"gesture": "pinch"} — hope that helps!'
+        text = 'Sure, here you go: {"gesture": "pinch"}, hope that helps!'
         assert classifier._extract_json(text) == {"gesture": "pinch"}
 
     def test_unparseable_raises(self):
@@ -65,7 +65,7 @@ class TestCoerceResponse:
 
 
 # ---------------------------------------------------------------------------
-# classify() — mocked network
+# classify(), mocked network
 # ---------------------------------------------------------------------------
 
 class TestClassifyHappyPath:
@@ -134,7 +134,7 @@ class TestClassifyHappyPath:
 
 
 # ---------------------------------------------------------------------------
-# classify() — hard failure fallback
+# classify(), hard failure fallback
 # ---------------------------------------------------------------------------
 
 class TestClassifyFallback:

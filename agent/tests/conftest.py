@@ -4,11 +4,11 @@ Shared fixtures for agent tests.
 Two things make the real agent code slow or network-dependent in a test
 run, and both are mocked here instead of using the real implementations:
 
-    * agent.classifier talks to OpenRouter over the network — patched with
+    * agent.classifier talks to OpenRouter over the network, patched with
       an httpx.MockTransport so classify() still runs its real JSON
       extraction / coercion / retry logic against a scripted response.
     * agent.recalibrator streams fresh WindowEnvelopes from myosignal at
-      real-time pace against a real (or synthetic) dataset — patched with an
+      real-time pace against a real (or synthetic) dataset, patched with an
       instant in-memory generator so tests don't block on wall-clock sleeps.
 """
 
@@ -60,7 +60,7 @@ def patch_openrouter(monkeypatch):
     """
     Patch agent.classifier._call_openrouter so it routes through an
     httpx.MockTransport driven by a caller-supplied `responder(payload) ->
-    ClassifierResponse dict` function — no real network access.
+    ClassifierResponse dict` function, no real network access.
     """
     from agent import classifier
 

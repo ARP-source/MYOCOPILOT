@@ -1,5 +1,5 @@
 """
-Tests for agent.drift_detector — rolling accuracy, confusion tracking,
+Tests for agent.drift_detector, rolling accuracy, confusion tracking,
 confidence-drop detection, and the debounced check_drift() trigger.
 """
 
@@ -29,7 +29,7 @@ class TestRollingAccuracy:
         d = DriftDetector(window_size=3)
         for _ in range(3):
             d.update("fist", _pred("pinch"))  # all wrong, fills window
-        d.update("fist", _pred("fist"))  # correct — should push out one wrong entry
+        d.update("fist", _pred("fist"))  # correct, should push out one wrong entry
         assert d.rolling_accuracy() == 1 / 3
 
 
@@ -84,7 +84,7 @@ class TestConfidenceDrop:
             d.update(None, _pred("fist", confidence=0.1))
 
         assert d.confidence_dropped() is True
-        # Rolling accuracy stays 1.0 (no labeled data) — only confidence signals drift.
+        # Rolling accuracy stays 1.0 (no labeled data), only confidence signals drift.
         assert d.rolling_accuracy() == 1.0
 
     def test_stable_confidence_does_not_trigger(self):
