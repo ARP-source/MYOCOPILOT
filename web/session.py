@@ -10,6 +10,7 @@ from __future__ import annotations
 from myosignal.types import POSE_SET
 from agent.types import ClassifierResponse
 from agent.drift_detector import DriftDetector
+from agent.feature_drift import FeatureDriftDetector, envelope_vector
 from agent.cost_tracker import CostTracker
 
 
@@ -23,7 +24,11 @@ class Session:
     history        : list of classification result dicts (append-only)
     accuracy_series: list of {"t_ms": int, "acc": float} snapshots
     confusion      : 9x9 confusion matrix (POSE_SET order), as list[list[int]]
-    detector       : active DriftDetector for this session
+    detector       : active DriftDetector for this session (rolling accuracy,
+                     confusion pairs, debounce)
+    feature_detector: label free FeatureDriftDetector. It enrolls on the first
+                     labeled windows of the session, then watches the
+                     features for drift (see agent/feature_drift.py)
     cost           : CostTracker accumulating API spend
     playing        : whether the stream is currently running (not paused)
     """
@@ -44,6 +49,7 @@ class Session:
             [0] * len(POSE_SET) for _ in POSE_SET
         ]
         self.detector = DriftDetector()
+        self.feature_detector = FeatureDriftDetector()
         self.cost = CostTracker()
         self.playing = True
 
@@ -91,6 +97,14 @@ class Session:
                 "rolling_accuracy_20": rolling_accuracy_20,
                 "cumulative_cost_usd": self.cost.cost_usd,
             }
+        )
+
+    def observe_features(self, envelope: dict) -> bool:
+        """Feed one window's features to the feature drift detector. Labeled
+        windows are used for enrollment until it is fitted; after that the
+        label is ignored. Returns whether its alarm is on."""
+        return self.feature_detector.observe(
+            envelope_vector(envelope), envelope.get("true_gesture")
         )
 
     def confusion_matrix_list(self) -> list[list[int]]:

@@ -162,21 +162,38 @@ class DriftDetector:
         self._last_trigger_wall = time.monotonic()
 
 
-def check_drift(detector: DriftDetector) -> tuple[str, str] | None:
+def check_drift(detector: DriftDetector, feature_detector=None) -> tuple[str, str] | None:
     """
-    Convenience wrapper: return the dominant confusion pair when drift is
-    detected, or None otherwise.
+    Convenience wrapper: return the confusion pair to recalibrate when drift
+    is detected, or None otherwise.
 
     Parameters
     ----------
     detector:
         A DriftDetector instance that has been updated with recent predictions.
+        Its confusion counts name the gesture to recalibrate, and it holds
+        the debounce timer.
+    feature_detector:
+        Optional agent.feature_drift.FeatureDriftDetector. Once it is fitted,
+        its label free alarm decides whether drift is happening, and the
+        accuracy and confidence rules in *detector* are not used. On real
+        NinaPro DB2 data the accuracy rule was true on about 81% of clean
+        windows (eval/drift_results.json), so it is only a fallback while the
+        feature detector is still collecting its enrollment windows.
 
     Returns
     -------
-    (target_gesture, confused_with) tuple, or None.
+    (target_gesture, confused_with) tuple, or None. With the feature
+    detector, None is also returned when it alarms but no labeled confusion
+    has been seen, because there is then no gesture to name.
     """
-    if detector.debounced() or not detector.drift_suspected():
+    if detector.debounced():
+        return None
+    if feature_detector is not None and feature_detector.fitted:
+        suspected = feature_detector.alarm
+    else:
+        suspected = detector.drift_suspected()
+    if not suspected:
         return None
 
     pair = detector.dominant_confusion() or detector.top_confusion_pair()
