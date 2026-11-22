@@ -1,0 +1,1452 @@
+{
+  "generated_at": "2026-11-22T05:40:42.867444+00:00",
+  "dataset": "NinaPro DB2, exercise B (S*_E1_A1.mat), restimulus/rerepetition labels",
+  "data_source_url": "https://doi.org/10.5061/dryad.1k84r",
+  "subjects": [
+    "S1",
+    "S2",
+    "S3",
+    "S4",
+    "S5"
+  ],
+  "classes": "17 movements, rest excluded",
+  "split": {
+    "train_reps": [
+      1,
+      3,
+      4,
+      6
+    ],
+    "test_reps": [
+      2,
+      5
+    ]
+  },
+  "windows": {
+    "length_ms": 250,
+    "stride_ms": 50,
+    "kept": "single label and single repetition only"
+  },
+  "features": "per channel RMS (12) + zero crossings / 50 (12), after 20-450 Hz bandpass and z-score from first 30 s",
+  "drift_modes": {
+    "rotate": "forearm ring channels 1-8 rotated by one electrode position; channels 9-12 unchanged",
+    "gain": "all channels x0.6",
+    "rotate_gain": "both"
+  },
+  "recalibration_note": "k examples per movement from drifted training reps, spread evenly. The prototype classifier stores at most PROTO_CAP=8 examples, so k=10 keeps 8.",
+  "summary_mean_over_subjects": {
+    "clean": {
+      "prototype": 0.287,
+      "lda_4": 0.3509,
+      "lda_all": 0.6612,
+      "nn1_all": 0.6265
+    },
+    "drift": {
+      "rotate": {
+        "prototype": 0.1534,
+        "lda_4": 0.1623,
+        "lda_all": 0.2085
+      },
+      "gain": {
+        "prototype": 0.221,
+        "lda_4": 0.2941,
+        "lda_all": 0.5381
+      },
+      "rotate_gain": {
+        "prototype": 0.1484,
+        "lda_4": 0.1465,
+        "lda_all": 0.1858
+      }
+    },
+    "recal_all": {
+      "rotate": {
+        "3": {
+          "prototype": 0.2693,
+          "lda_refit": 0.3327
+        },
+        "5": {
+          "prototype": 0.3253,
+          "lda_refit": 0.3856
+        },
+        "10": {
+          "prototype": 0.5159,
+          "lda_refit": 0.572
+        }
+      },
+      "gain": {
+        "3": {
+          "prototype": 0.2452,
+          "lda_refit": 0.3308
+        },
+        "5": {
+          "prototype": 0.2996,
+          "lda_refit": 0.3857
+        },
+        "10": {
+          "prototype": 0.4549,
+          "lda_refit": 0.5707
+        }
+      },
+      "rotate_gain": {
+        "3": {
+          "prototype": 0.2439,
+          "lda_refit": 0.3331
+        },
+        "5": {
+          "prototype": 0.2963,
+          "lda_refit": 0.3853
+        },
+        "10": {
+          "prototype": 0.4601,
+          "lda_refit": 0.5712
+        }
+      }
+    },
+    "early_vs_late": {
+      "prototype": 0.2366,
+      "lda_3": 0.2833,
+      "lda_all": 0.5733
+    },
+    "targeted": {
+      "rotate": {
+        "3": {
+          "detected": 5,
+          "latency_s": [
+            0.95,
+            0.95,
+            0.95,
+            0.95,
+            0.95
+          ],
+          "post_drift_before_recal": 0.05,
+          "post_recal_overall": 0.1175,
+          "no_recal_same_span": 0.1558,
+          "flagged_movement_after": 0.8147,
+          "flagged_movement_no_recal": 0.0026
+        },
+        "5": {
+          "detected": 5,
+          "latency_s": [
+            0.95,
+            0.95,
+            0.95,
+            0.95,
+            0.95
+          ],
+          "post_drift_before_recal": 0.05,
+          "post_recal_overall": 0.1129,
+          "no_recal_same_span": 0.1558,
+          "flagged_movement_after": 0.8641,
+          "flagged_movement_no_recal": 0.0026
+        },
+        "10": {
+          "detected": 5,
+          "latency_s": [
+            0.95,
+            0.95,
+            0.95,
+            0.95,
+            0.95
+          ],
+          "post_drift_before_recal": 0.05,
+          "post_recal_overall": 0.1051,
+          "no_recal_same_span": 0.1558,
+          "flagged_movement_after": 0.9037,
+          "flagged_movement_no_recal": 0.0026
+        }
+      },
+      "gain": {
+        "3": {
+          "detected": 5,
+          "latency_s": [
+            1.25,
+            0.95,
+            0.95,
+            0.95,
+            0.95
+          ],
+          "post_drift_before_recal": 0.2408,
+          "post_recal_overall": 0.2116,
+          "no_recal_same_span": 0.2203,
+          "flagged_movement_after": 0.2258,
+          "flagged_movement_no_recal": 0.2349
+        },
+        "5": {
+          "detected": 5,
+          "latency_s": [
+            1.25,
+            0.95,
+            0.95,
+            0.95,
+            0.95
+          ],
+          "post_drift_before_recal": 0.2408,
+          "post_recal_overall": 0.2067,
+          "no_recal_same_span": 0.2203,
+          "flagged_movement_after": 0.3105,
+          "flagged_movement_no_recal": 0.2349
+        },
+        "10": {
+          "detected": 5,
+          "latency_s": [
+            1.25,
+            0.95,
+            0.95,
+            0.95,
+            0.95
+          ],
+          "post_drift_before_recal": 0.2408,
+          "post_recal_overall": 0.1948,
+          "no_recal_same_span": 0.2203,
+          "flagged_movement_after": 0.4937,
+          "flagged_movement_no_recal": 0.2349
+        }
+      },
+      "rotate_gain": {
+        "3": {
+          "detected": 5,
+          "latency_s": [
+            0.95,
+            0.95,
+            0.95,
+            0.95,
+            0.95
+          ],
+          "post_drift_before_recal": 0.05,
+          "post_recal_overall": 0.1143,
+          "no_recal_same_span": 0.1539,
+          "flagged_movement_after": 0.7066,
+          "flagged_movement_no_recal": 0.0143
+        },
+        "5": {
+          "detected": 5,
+          "latency_s": [
+            0.95,
+            0.95,
+            0.95,
+            0.95,
+            0.95
+          ],
+          "post_drift_before_recal": 0.05,
+          "post_recal_overall": 0.1054,
+          "no_recal_same_span": 0.1539,
+          "flagged_movement_after": 0.7482,
+          "flagged_movement_no_recal": 0.0143
+        },
+        "10": {
+          "detected": 5,
+          "latency_s": [
+            0.95,
+            0.95,
+            0.95,
+            0.95,
+            0.95
+          ],
+          "post_drift_before_recal": 0.05,
+          "post_recal_overall": 0.0886,
+          "no_recal_same_span": 0.1539,
+          "flagged_movement_after": 0.8958,
+          "flagged_movement_no_recal": 0.0143
+        }
+      }
+    },
+    "clean_accuracy_rule_true_frac": 0.8435
+  },
+  "per_subject": [
+    {
+      "subject": "S1",
+      "n_train_windows": 4639,
+      "n_test_windows": 2287,
+      "n_prototype_examples_per_class": 4,
+      "clean": {
+        "prototype": 0.2405,
+        "lda_4": 0.3402,
+        "lda_all": 0.6856,
+        "nn1_all": 0.6519
+      },
+      "drift": {
+        "rotate": {
+          "prototype": 0.1981,
+          "lda_4": 0.1946,
+          "lda_all": 0.1981
+        },
+        "gain": {
+          "prototype": 0.2169,
+          "lda_4": 0.345,
+          "lda_all": 0.5518
+        },
+        "rotate_gain": {
+          "prototype": 0.1946,
+          "lda_4": 0.1788,
+          "lda_all": 0.1447
+        }
+      },
+      "recal_all": {
+        "rotate": {
+          "3": {
+            "prototype": 0.2427,
+            "prototype_examples_stored": 3,
+            "lda_refit": 0.2886
+          },
+          "5": {
+            "prototype": 0.3393,
+            "prototype_examples_stored": 5,
+            "lda_refit": 0.3551
+          },
+          "10": {
+            "prototype": 0.5444,
+            "prototype_examples_stored": 8,
+            "lda_refit": 0.6008
+          }
+        },
+        "gain": {
+          "3": {
+            "prototype": 0.2059,
+            "prototype_examples_stored": 3,
+            "lda_refit": 0.2855
+          },
+          "5": {
+            "prototype": 0.2807,
+            "prototype_examples_stored": 5,
+            "lda_refit": 0.3542
+          },
+          "10": {
+            "prototype": 0.4617,
+            "prototype_examples_stored": 8,
+            "lda_refit": 0.599
+          }
+        },
+        "rotate_gain": {
+          "3": {
+            "prototype": 0.2046,
+            "prototype_examples_stored": 3,
+            "lda_refit": 0.2882
+          },
+          "5": {
+            "prototype": 0.2973,
+            "prototype_examples_stored": 5,
+            "lda_refit": 0.3551
+          },
+          "10": {
+            "prototype": 0.474,
+            "prototype_examples_stored": 8,
+            "lda_refit": 0.5999
+          }
+        }
+      },
+      "targeted": {
+        "rotate": {
+          "3": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.8399,
+            "drift_injected_at_test_window": 800,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B9"
+            ],
+            "post_drift_before_recal": 0.1,
+            "post_recal_overall": 0.0975,
+            "no_recal_same_span": 0.1602,
+            "flagged_movement_after": 1.0,
+            "flagged_movement_no_recal": 0.0
+          },
+          "5": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.8399,
+            "drift_injected_at_test_window": 800,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B9"
+            ],
+            "post_drift_before_recal": 0.1,
+            "post_recal_overall": 0.0961,
+            "no_recal_same_span": 0.1602,
+            "flagged_movement_after": 1.0,
+            "flagged_movement_no_recal": 0.0
+          },
+          "10": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.8399,
+            "drift_injected_at_test_window": 800,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B9"
+            ],
+            "post_drift_before_recal": 0.1,
+            "post_recal_overall": 0.0866,
+            "no_recal_same_span": 0.1602,
+            "flagged_movement_after": 1.0,
+            "flagged_movement_no_recal": 0.0
+          }
+        },
+        "gain": {
+          "3": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.8399,
+            "drift_injected_at_test_window": 800,
+            "detected": true,
+            "detection_latency_windows": 25,
+            "detection_latency_s": 1.25,
+            "flagged_pair": [
+              "B5",
+              "B10"
+            ],
+            "post_drift_before_recal": 0.6538,
+            "post_recal_overall": 0.1807,
+            "no_recal_same_span": 0.1718,
+            "flagged_movement_after": 0.1379,
+            "flagged_movement_no_recal": 0.0
+          },
+          "5": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.8399,
+            "drift_injected_at_test_window": 800,
+            "detected": true,
+            "detection_latency_windows": 25,
+            "detection_latency_s": 1.25,
+            "flagged_pair": [
+              "B5",
+              "B10"
+            ],
+            "post_drift_before_recal": 0.6538,
+            "post_recal_overall": 0.1828,
+            "no_recal_same_span": 0.1718,
+            "flagged_movement_after": 0.3103,
+            "flagged_movement_no_recal": 0.0
+          },
+          "10": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.8399,
+            "drift_injected_at_test_window": 800,
+            "detected": true,
+            "detection_latency_windows": 25,
+            "detection_latency_s": 1.25,
+            "flagged_pair": [
+              "B5",
+              "B10"
+            ],
+            "post_drift_before_recal": 0.6538,
+            "post_recal_overall": 0.1821,
+            "no_recal_same_span": 0.1718,
+            "flagged_movement_after": 0.7931,
+            "flagged_movement_no_recal": 0.0
+          }
+        },
+        "rotate_gain": {
+          "3": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.8399,
+            "drift_injected_at_test_window": 800,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B9"
+            ],
+            "post_drift_before_recal": 0.15,
+            "post_recal_overall": 0.1084,
+            "no_recal_same_span": 0.1506,
+            "flagged_movement_after": 0.7429,
+            "flagged_movement_no_recal": 0.0571
+          },
+          "5": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.8399,
+            "drift_injected_at_test_window": 800,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B9"
+            ],
+            "post_drift_before_recal": 0.15,
+            "post_recal_overall": 0.107,
+            "no_recal_same_span": 0.1506,
+            "flagged_movement_after": 0.7429,
+            "flagged_movement_no_recal": 0.0571
+          },
+          "10": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.8399,
+            "drift_injected_at_test_window": 800,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B9"
+            ],
+            "post_drift_before_recal": 0.15,
+            "post_recal_overall": 0.0825,
+            "no_recal_same_span": 0.1506,
+            "flagged_movement_after": 1.0,
+            "flagged_movement_no_recal": 0.0571
+          }
+        }
+      },
+      "early_vs_late": {
+        "prototype": 0.2498,
+        "lda_3": 0.3097,
+        "lda_all": 0.6638
+      }
+    },
+    {
+      "subject": "S2",
+      "n_train_windows": 5675,
+      "n_test_windows": 2790,
+      "n_prototype_examples_per_class": 4,
+      "clean": {
+        "prototype": 0.3455,
+        "lda_4": 0.3746,
+        "lda_all": 0.6609,
+        "nn1_all": 0.6323
+      },
+      "drift": {
+        "rotate": {
+          "prototype": 0.167,
+          "lda_4": 0.1978,
+          "lda_all": 0.172
+        },
+        "gain": {
+          "prototype": 0.2125,
+          "lda_4": 0.2961,
+          "lda_all": 0.5323
+        },
+        "rotate_gain": {
+          "prototype": 0.148,
+          "lda_4": 0.1588,
+          "lda_all": 0.1498
+        }
+      },
+      "recal_all": {
+        "rotate": {
+          "3": {
+            "prototype": 0.2484,
+            "prototype_examples_stored": 3,
+            "lda_refit": 0.2828
+          },
+          "5": {
+            "prototype": 0.3211,
+            "prototype_examples_stored": 5,
+            "lda_refit": 0.3849
+          },
+          "10": {
+            "prototype": 0.5355,
+            "prototype_examples_stored": 8,
+            "lda_refit": 0.5835
+          }
+        },
+        "gain": {
+          "3": {
+            "prototype": 0.2254,
+            "prototype_examples_stored": 3,
+            "lda_refit": 0.2821
+          },
+          "5": {
+            "prototype": 0.29,
+            "prototype_examples_stored": 5,
+            "lda_refit": 0.386
+          },
+          "10": {
+            "prototype": 0.4609,
+            "prototype_examples_stored": 8,
+            "lda_refit": 0.5849
+          }
+        },
+        "rotate_gain": {
+          "3": {
+            "prototype": 0.2201,
+            "prototype_examples_stored": 3,
+            "lda_refit": 0.2828
+          },
+          "5": {
+            "prototype": 0.2989,
+            "prototype_examples_stored": 5,
+            "lda_refit": 0.3849
+          },
+          "10": {
+            "prototype": 0.467,
+            "prototype_examples_stored": 8,
+            "lda_refit": 0.5835
+          }
+        }
+      },
+      "targeted": {
+        "rotate": {
+          "3": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.6792,
+            "drift_injected_at_test_window": 976,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B6",
+              "B10"
+            ],
+            "post_drift_before_recal": 0.0,
+            "post_recal_overall": 0.0942,
+            "no_recal_same_span": 0.1912,
+            "flagged_movement_after": 0.5833,
+            "flagged_movement_no_recal": 0.0
+          },
+          "5": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.6792,
+            "drift_injected_at_test_window": 976,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B6",
+              "B10"
+            ],
+            "post_drift_before_recal": 0.0,
+            "post_recal_overall": 0.0942,
+            "no_recal_same_span": 0.1912,
+            "flagged_movement_after": 0.5833,
+            "flagged_movement_no_recal": 0.0
+          },
+          "10": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.6792,
+            "drift_injected_at_test_window": 976,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B6",
+              "B10"
+            ],
+            "post_drift_before_recal": 0.0,
+            "post_recal_overall": 0.1433,
+            "no_recal_same_span": 0.1912,
+            "flagged_movement_after": 0.9167,
+            "flagged_movement_no_recal": 0.0
+          }
+        },
+        "gain": {
+          "3": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.6792,
+            "drift_injected_at_test_window": 976,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B6",
+              "B5"
+            ],
+            "post_drift_before_recal": 0.0,
+            "post_recal_overall": 0.1706,
+            "no_recal_same_span": 0.175,
+            "flagged_movement_after": 0.0,
+            "flagged_movement_no_recal": 0.0
+          },
+          "5": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.6792,
+            "drift_injected_at_test_window": 976,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B6",
+              "B5"
+            ],
+            "post_drift_before_recal": 0.0,
+            "post_recal_overall": 0.1695,
+            "no_recal_same_span": 0.175,
+            "flagged_movement_after": 0.0,
+            "flagged_movement_no_recal": 0.0
+          },
+          "10": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.6792,
+            "drift_injected_at_test_window": 976,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B6",
+              "B5"
+            ],
+            "post_drift_before_recal": 0.0,
+            "post_recal_overall": 0.155,
+            "no_recal_same_span": 0.175,
+            "flagged_movement_after": 0.0,
+            "flagged_movement_no_recal": 0.0
+          }
+        },
+        "rotate_gain": {
+          "3": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.6792,
+            "drift_injected_at_test_window": 976,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B6",
+              "B5"
+            ],
+            "post_drift_before_recal": 0.0,
+            "post_recal_overall": 0.0987,
+            "no_recal_same_span": 0.1455,
+            "flagged_movement_after": 0.4167,
+            "flagged_movement_no_recal": 0.0
+          },
+          "5": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.6792,
+            "drift_injected_at_test_window": 976,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B6",
+              "B5"
+            ],
+            "post_drift_before_recal": 0.0,
+            "post_recal_overall": 0.0987,
+            "no_recal_same_span": 0.1455,
+            "flagged_movement_after": 0.4167,
+            "flagged_movement_no_recal": 0.0
+          },
+          "10": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.6792,
+            "drift_injected_at_test_window": 976,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B6",
+              "B5"
+            ],
+            "post_drift_before_recal": 0.0,
+            "post_recal_overall": 0.0987,
+            "no_recal_same_span": 0.1455,
+            "flagged_movement_after": 0.5833,
+            "flagged_movement_no_recal": 0.0
+          }
+        }
+      },
+      "early_vs_late": {
+        "prototype": 0.2315,
+        "lda_3": 0.2576,
+        "lda_all": 0.5413
+      }
+    },
+    {
+      "subject": "S3",
+      "n_train_windows": 5525,
+      "n_test_windows": 2532,
+      "n_prototype_examples_per_class": 4,
+      "clean": {
+        "prototype": 0.342,
+        "lda_4": 0.4562,
+        "lda_all": 0.7283,
+        "nn1_all": 0.6528
+      },
+      "drift": {
+        "rotate": {
+          "prototype": 0.1521,
+          "lda_4": 0.137,
+          "lda_all": 0.2441
+        },
+        "gain": {
+          "prototype": 0.2389,
+          "lda_4": 0.3278,
+          "lda_all": 0.6019
+        },
+        "rotate_gain": {
+          "prototype": 0.1521,
+          "lda_4": 0.1051,
+          "lda_all": 0.2164
+        }
+      },
+      "recal_all": {
+        "rotate": {
+          "3": {
+            "prototype": 0.3341,
+            "prototype_examples_stored": 3,
+            "lda_refit": 0.4285
+          },
+          "5": {
+            "prototype": 0.3942,
+            "prototype_examples_stored": 5,
+            "lda_refit": 0.4814
+          },
+          "10": {
+            "prototype": 0.5699,
+            "prototype_examples_stored": 8,
+            "lda_refit": 0.6382
+          }
+        },
+        "gain": {
+          "3": {
+            "prototype": 0.3191,
+            "prototype_examples_stored": 3,
+            "lda_refit": 0.425
+          },
+          "5": {
+            "prototype": 0.3543,
+            "prototype_examples_stored": 5,
+            "lda_refit": 0.4814
+          },
+          "10": {
+            "prototype": 0.5071,
+            "prototype_examples_stored": 8,
+            "lda_refit": 0.6347
+          }
+        },
+        "rotate_gain": {
+          "3": {
+            "prototype": 0.3104,
+            "prototype_examples_stored": 3,
+            "lda_refit": 0.4269
+          },
+          "5": {
+            "prototype": 0.3479,
+            "prototype_examples_stored": 5,
+            "lda_refit": 0.4814
+          },
+          "10": {
+            "prototype": 0.5174,
+            "prototype_examples_stored": 8,
+            "lda_refit": 0.6382
+          }
+        }
+      },
+      "targeted": {
+        "rotate": {
+          "3": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.7728,
+            "drift_injected_at_test_window": 886,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B15"
+            ],
+            "post_drift_before_recal": 0.0,
+            "post_recal_overall": 0.0916,
+            "no_recal_same_span": 0.1144,
+            "flagged_movement_after": 1.0,
+            "flagged_movement_no_recal": 0.0
+          },
+          "5": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.7728,
+            "drift_injected_at_test_window": 886,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B15"
+            ],
+            "post_drift_before_recal": 0.0,
+            "post_recal_overall": 0.0886,
+            "no_recal_same_span": 0.1144,
+            "flagged_movement_after": 1.0,
+            "flagged_movement_no_recal": 0.0
+          },
+          "10": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.7728,
+            "drift_injected_at_test_window": 886,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B15"
+            ],
+            "post_drift_before_recal": 0.0,
+            "post_recal_overall": 0.0763,
+            "no_recal_same_span": 0.1144,
+            "flagged_movement_after": 1.0,
+            "flagged_movement_no_recal": 0.0
+          }
+        },
+        "gain": {
+          "3": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.7728,
+            "drift_injected_at_test_window": 886,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B14"
+            ],
+            "post_drift_before_recal": 0.0,
+            "post_recal_overall": 0.2386,
+            "no_recal_same_span": 0.2829,
+            "flagged_movement_after": 0.1818,
+            "flagged_movement_no_recal": 0.2727
+          },
+          "5": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.7728,
+            "drift_injected_at_test_window": 886,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B14"
+            ],
+            "post_drift_before_recal": 0.0,
+            "post_recal_overall": 0.2362,
+            "no_recal_same_span": 0.2829,
+            "flagged_movement_after": 0.1818,
+            "flagged_movement_no_recal": 0.2727
+          },
+          "10": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.7728,
+            "drift_injected_at_test_window": 886,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B14"
+            ],
+            "post_drift_before_recal": 0.0,
+            "post_recal_overall": 0.1907,
+            "no_recal_same_span": 0.2829,
+            "flagged_movement_after": 0.1818,
+            "flagged_movement_no_recal": 0.2727
+          }
+        },
+        "rotate_gain": {
+          "3": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.7728,
+            "drift_injected_at_test_window": 886,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B6"
+            ],
+            "post_drift_before_recal": 0.0,
+            "post_recal_overall": 0.0855,
+            "no_recal_same_span": 0.1648,
+            "flagged_movement_after": 1.0,
+            "flagged_movement_no_recal": 0.0
+          },
+          "5": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.7728,
+            "drift_injected_at_test_window": 886,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B6"
+            ],
+            "post_drift_before_recal": 0.0,
+            "post_recal_overall": 0.0806,
+            "no_recal_same_span": 0.1648,
+            "flagged_movement_after": 1.0,
+            "flagged_movement_no_recal": 0.0
+          },
+          "10": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.7728,
+            "drift_injected_at_test_window": 886,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B6"
+            ],
+            "post_drift_before_recal": 0.0,
+            "post_recal_overall": 0.064,
+            "no_recal_same_span": 0.1648,
+            "flagged_movement_after": 1.0,
+            "flagged_movement_no_recal": 0.0
+          }
+        }
+      },
+      "early_vs_late": {
+        "prototype": 0.2496,
+        "lda_3": 0.2859,
+        "lda_all": 0.5672
+      }
+    },
+    {
+      "subject": "S4",
+      "n_train_windows": 7454,
+      "n_test_windows": 3469,
+      "n_prototype_examples_per_class": 4,
+      "clean": {
+        "prototype": 0.207,
+        "lda_4": 0.2312,
+        "lda_all": 0.5907,
+        "nn1_all": 0.5814
+      },
+      "drift": {
+        "rotate": {
+          "prototype": 0.1032,
+          "lda_4": 0.1179,
+          "lda_all": 0.1433
+        },
+        "gain": {
+          "prototype": 0.1522,
+          "lda_4": 0.2058,
+          "lda_all": 0.4445
+        },
+        "rotate_gain": {
+          "prototype": 0.0862,
+          "lda_4": 0.1072,
+          "lda_all": 0.1479
+        }
+      },
+      "recal_all": {
+        "rotate": {
+          "3": {
+            "prototype": 0.2113,
+            "prototype_examples_stored": 3,
+            "lda_refit": 0.2551
+          },
+          "5": {
+            "prototype": 0.228,
+            "prototype_examples_stored": 5,
+            "lda_refit": 0.2753
+          },
+          "10": {
+            "prototype": 0.437,
+            "prototype_examples_stored": 8,
+            "lda_refit": 0.4967
+          }
+        },
+        "gain": {
+          "3": {
+            "prototype": 0.1854,
+            "prototype_examples_stored": 3,
+            "lda_refit": 0.2545
+          },
+          "5": {
+            "prototype": 0.2113,
+            "prototype_examples_stored": 5,
+            "lda_refit": 0.2739
+          },
+          "10": {
+            "prototype": 0.3877,
+            "prototype_examples_stored": 8,
+            "lda_refit": 0.4938
+          }
+        },
+        "rotate_gain": {
+          "3": {
+            "prototype": 0.198,
+            "prototype_examples_stored": 3,
+            "lda_refit": 0.2577
+          },
+          "5": {
+            "prototype": 0.211,
+            "prototype_examples_stored": 5,
+            "lda_refit": 0.2736
+          },
+          "10": {
+            "prototype": 0.3903,
+            "prototype_examples_stored": 8,
+            "lda_refit": 0.4944
+          }
+        }
+      },
+      "targeted": {
+        "rotate": {
+          "3": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.9372,
+            "drift_injected_at_test_window": 1214,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B6",
+              "B12"
+            ],
+            "post_drift_before_recal": 0.05,
+            "post_recal_overall": 0.1423,
+            "no_recal_same_span": 0.1414,
+            "flagged_movement_after": 0.7403,
+            "flagged_movement_no_recal": 0.013
+          },
+          "5": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.9372,
+            "drift_injected_at_test_window": 1214,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B6",
+              "B12"
+            ],
+            "post_drift_before_recal": 0.05,
+            "post_recal_overall": 0.1418,
+            "no_recal_same_span": 0.1414,
+            "flagged_movement_after": 0.987,
+            "flagged_movement_no_recal": 0.013
+          },
+          "10": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.9372,
+            "drift_injected_at_test_window": 1214,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B6",
+              "B12"
+            ],
+            "post_drift_before_recal": 0.05,
+            "post_recal_overall": 0.128,
+            "no_recal_same_span": 0.1414,
+            "flagged_movement_after": 0.9351,
+            "flagged_movement_no_recal": 0.013
+          }
+        },
+        "gain": {
+          "3": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.9372,
+            "drift_injected_at_test_window": 1214,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B9"
+            ],
+            "post_drift_before_recal": 0.05,
+            "post_recal_overall": 0.1423,
+            "no_recal_same_span": 0.1481,
+            "flagged_movement_after": null,
+            "flagged_movement_no_recal": null
+          },
+          "5": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.9372,
+            "drift_injected_at_test_window": 1214,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B9"
+            ],
+            "post_drift_before_recal": 0.05,
+            "post_recal_overall": 0.1409,
+            "no_recal_same_span": 0.1481,
+            "flagged_movement_after": null,
+            "flagged_movement_no_recal": null
+          },
+          "10": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.9372,
+            "drift_injected_at_test_window": 1214,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B9"
+            ],
+            "post_drift_before_recal": 0.05,
+            "post_recal_overall": 0.1351,
+            "no_recal_same_span": 0.1481,
+            "flagged_movement_after": null,
+            "flagged_movement_no_recal": null
+          }
+        },
+        "rotate_gain": {
+          "3": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.9372,
+            "drift_injected_at_test_window": 1214,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B10"
+            ],
+            "post_drift_before_recal": 0.0,
+            "post_recal_overall": 0.106,
+            "no_recal_same_span": 0.1262,
+            "flagged_movement_after": null,
+            "flagged_movement_no_recal": null
+          },
+          "5": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.9372,
+            "drift_injected_at_test_window": 1214,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B10"
+            ],
+            "post_drift_before_recal": 0.0,
+            "post_recal_overall": 0.102,
+            "no_recal_same_span": 0.1262,
+            "flagged_movement_after": null,
+            "flagged_movement_no_recal": null
+          },
+          "10": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.9372,
+            "drift_injected_at_test_window": 1214,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B10"
+            ],
+            "post_drift_before_recal": 0.0,
+            "post_recal_overall": 0.055,
+            "no_recal_same_span": 0.1262,
+            "flagged_movement_after": null,
+            "flagged_movement_no_recal": null
+          }
+        }
+      },
+      "early_vs_late": {
+        "prototype": 0.2384,
+        "lda_3": 0.2422,
+        "lda_all": 0.487
+      }
+    },
+    {
+      "subject": "S5",
+      "n_train_windows": 4475,
+      "n_test_windows": 2275,
+      "n_prototype_examples_per_class": 4,
+      "clean": {
+        "prototype": 0.3002,
+        "lda_4": 0.3521,
+        "lda_all": 0.6404,
+        "nn1_all": 0.6141
+      },
+      "drift": {
+        "rotate": {
+          "prototype": 0.1464,
+          "lda_4": 0.1644,
+          "lda_all": 0.2848
+        },
+        "gain": {
+          "prototype": 0.2844,
+          "lda_4": 0.2958,
+          "lda_all": 0.56
+        },
+        "rotate_gain": {
+          "prototype": 0.1613,
+          "lda_4": 0.1824,
+          "lda_all": 0.2703
+        }
+      },
+      "recal_all": {
+        "rotate": {
+          "3": {
+            "prototype": 0.3099,
+            "prototype_examples_stored": 3,
+            "lda_refit": 0.4084
+          },
+          "5": {
+            "prototype": 0.3437,
+            "prototype_examples_stored": 5,
+            "lda_refit": 0.4312
+          },
+          "10": {
+            "prototype": 0.4927,
+            "prototype_examples_stored": 8,
+            "lda_refit": 0.5407
+          }
+        },
+        "gain": {
+          "3": {
+            "prototype": 0.2901,
+            "prototype_examples_stored": 3,
+            "lda_refit": 0.407
+          },
+          "5": {
+            "prototype": 0.3618,
+            "prototype_examples_stored": 5,
+            "lda_refit": 0.433
+          },
+          "10": {
+            "prototype": 0.4571,
+            "prototype_examples_stored": 8,
+            "lda_refit": 0.5411
+          }
+        },
+        "rotate_gain": {
+          "3": {
+            "prototype": 0.2866,
+            "prototype_examples_stored": 3,
+            "lda_refit": 0.4101
+          },
+          "5": {
+            "prototype": 0.3262,
+            "prototype_examples_stored": 5,
+            "lda_refit": 0.4316
+          },
+          "10": {
+            "prototype": 0.4519,
+            "prototype_examples_stored": 8,
+            "lda_refit": 0.5402
+          }
+        }
+      },
+      "targeted": {
+        "rotate": {
+          "3": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.9884,
+            "drift_injected_at_test_window": 796,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B16"
+            ],
+            "post_drift_before_recal": 0.1,
+            "post_recal_overall": 0.1618,
+            "no_recal_same_span": 0.172,
+            "flagged_movement_after": 0.75,
+            "flagged_movement_no_recal": 0.0
+          },
+          "5": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.9884,
+            "drift_injected_at_test_window": 796,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B16"
+            ],
+            "post_drift_before_recal": 0.1,
+            "post_recal_overall": 0.1439,
+            "no_recal_same_span": 0.172,
+            "flagged_movement_after": 0.75,
+            "flagged_movement_no_recal": 0.0
+          },
+          "10": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.9884,
+            "drift_injected_at_test_window": 796,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B16"
+            ],
+            "post_drift_before_recal": 0.1,
+            "post_recal_overall": 0.0912,
+            "no_recal_same_span": 0.172,
+            "flagged_movement_after": 0.6667,
+            "flagged_movement_no_recal": 0.0
+          }
+        },
+        "gain": {
+          "3": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.9884,
+            "drift_injected_at_test_window": 796,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B11"
+            ],
+            "post_drift_before_recal": 0.5,
+            "post_recal_overall": 0.3256,
+            "no_recal_same_span": 0.3235,
+            "flagged_movement_after": 0.5833,
+            "flagged_movement_no_recal": 0.6667
+          },
+          "5": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.9884,
+            "drift_injected_at_test_window": 796,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B11"
+            ],
+            "post_drift_before_recal": 0.5,
+            "post_recal_overall": 0.3043,
+            "no_recal_same_span": 0.3235,
+            "flagged_movement_after": 0.75,
+            "flagged_movement_no_recal": 0.6667
+          },
+          "10": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.9884,
+            "drift_injected_at_test_window": 796,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B11"
+            ],
+            "post_drift_before_recal": 0.5,
+            "post_recal_overall": 0.3112,
+            "no_recal_same_span": 0.3235,
+            "flagged_movement_after": 1.0,
+            "flagged_movement_no_recal": 0.6667
+          }
+        },
+        "rotate_gain": {
+          "3": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.9884,
+            "drift_injected_at_test_window": 796,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B17"
+            ],
+            "post_drift_before_recal": 0.1,
+            "post_recal_overall": 0.1727,
+            "no_recal_same_span": 0.1823,
+            "flagged_movement_after": 0.6667,
+            "flagged_movement_no_recal": 0.0
+          },
+          "5": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.9884,
+            "drift_injected_at_test_window": 796,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B17"
+            ],
+            "post_drift_before_recal": 0.1,
+            "post_recal_overall": 0.1385,
+            "no_recal_same_span": 0.1823,
+            "flagged_movement_after": 0.8333,
+            "flagged_movement_no_recal": 0.0
+          },
+          "10": {
+            "clean_windows_with_accuracy_rule_true_frac": 0.9884,
+            "drift_injected_at_test_window": 796,
+            "detected": true,
+            "detection_latency_windows": 19,
+            "detection_latency_s": 0.95,
+            "flagged_pair": [
+              "B5",
+              "B17"
+            ],
+            "post_drift_before_recal": 0.1,
+            "post_recal_overall": 0.1426,
+            "no_recal_same_span": 0.1823,
+            "flagged_movement_after": 1.0,
+            "flagged_movement_no_recal": 0.0
+          }
+        }
+      },
+      "early_vs_late": {
+        "prototype": 0.2139,
+        "lda_3": 0.321,
+        "lda_all": 0.607
+      }
+    }
+  ]
+}
