@@ -1,5 +1,5 @@
 """
-agent.recalibrator — conversational recalibration workflow.
+agent.recalibrator, conversational recalibration workflow.
 
 When drift is detected the recalibrator:
 1. Generates an interview question for the user via the LLM.
@@ -62,7 +62,7 @@ async def generate_interview_question(
     A natural-language question string suitable for display in the dashboard.
     """
     fallback = (
-        f"I'm mixing up '{target_gesture}' with '{confused_with}' lately — "
+        f"I'm mixing up '{target_gesture}' with '{confused_with}' lately, "
         f"could you perform '{target_gesture}' a few times so I can recalibrate?"
     )
 
@@ -141,7 +141,7 @@ def _collect_matching_examples(subject: str, gesture: str, n_samples: int) -> li
 def _collect_matching_envelopes(subject: str, gesture: str, n_samples: int) -> list[WindowEnvelope]:
     """Blocking helper: like _collect_matching_examples, but returns the full
     confirmed WindowEnvelopes (not just their spectrogram PNGs) so callers
-    can also enroll the underlying RMS/zero-crossing features — e.g.
+    can also enroll the underlying RMS/zero-crossing features, e.g.
     agent.mock_classifier's profile, which never looks at the spectrogram."""
     envelopes: list[WindowEnvelope] = []
     for envelope in myosignal_stream(subject):
@@ -165,7 +165,7 @@ def _collect_target_gesture_windows(
 
     A fresh stream restarts at t=0 of a brand-new synthetic/real session, and
     that session's first windows are not guaranteed (and for the synthetic
-    generator, are actively unlikely) to be *gesture* — so grading
+    generator, are actively unlikely) to be *gesture*, so grading
     post-recalibration accuracy on "whatever comes next" can silently score
     an unrelated gesture instead of the one that was just recalibrated. This
     filters explicitly so acc_after is always a true post-recalibration test
@@ -176,7 +176,7 @@ def _collect_target_gesture_windows(
     subject:
         Subject identifier used to look up the active stream.
     gesture:
-        The gesture that was just recalibrated — must be enrolled in the
+        The gesture that was just recalibrated, must be enrolled in the
         window's true_gesture, not merely present in a following window.
     n_windows:
         Number of matching windows to collect.
@@ -218,7 +218,7 @@ async def recalibrate(
 
     acc_after is measured over the next POST_RECAL_WINDOWS windows whose
     true_gesture equals *gesture* specifically (via
-    _collect_target_gesture_windows — never just "whatever comes next" from
+    _collect_target_gesture_windows, never just "whatever comes next" from
     the fresh stream, which restarts at t=0 of a brand-new session and is
     not guaranteed to replay *gesture* first). Those windows are classified
     with the refreshed reference profile and also fed into *detector* so the
@@ -233,7 +233,7 @@ async def recalibrate(
     confused_with:
         The gesture currently confused with *gesture*.
     detector:
-        Active DriftDetector — used to snapshot accuracy before and after.
+        Active DriftDetector, used to snapshot accuracy before and after.
     cost_tracker:
         If given, records token usage from the post-recalibration classify
         calls (mirrors the cost_tracker accepted by agent.classifier.classify).

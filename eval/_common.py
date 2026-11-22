@@ -1,5 +1,5 @@
 """
-eval._common — shared session loading/segmentation helpers for the eval/ package.
+eval._common, shared session loading/segmentation helpers for the eval/ package.
 
 Every script under eval/ (run.py, baselines.py) needs the same thing: find up
 to 3 subjects (real NinaPro/emg2pose files under data/, falling back to
@@ -10,7 +10,7 @@ This intentionally talks to myosignal.loaders / myosignal.preprocess /
 myosignal.windows directly rather than going through myosignal.stream() /
 SessionPlayer.stream().  Those replay at 1x real-time wall-clock pace (by
 design, for the live dashboard) and render a spectrogram PNG for every
-window — both are wasted work for an offline batch evaluation that only
+window, both are wasted work for an offline batch evaluation that only
 needs the RMS/zero-crossing features and ground-truth labels. No file
 outside eval/ is modified to make this possible; everything here calls
 already-public myosignal functions.

@@ -38,7 +38,7 @@ function rawHandHtml(): Plugin {
 export default defineConfig({
   plugins: [rawHandHtml(), react()],
   // Without this, Vite's dependency scanner globs every .html file in the
-  // project — including public/hand.html — and tries to pre-bundle its
+  // project, including public/hand.html, and tries to pre-bundle its
   // CDN-importmap-resolved "three" imports as if they were npm packages,
   // logging a spurious (non-fatal) error on every dev-server start.
   optimizeDeps: {

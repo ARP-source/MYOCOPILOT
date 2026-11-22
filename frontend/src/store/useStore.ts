@@ -267,7 +267,7 @@ function handleServerMsg(
     set({
       recalRequest: msg,
       recalResult: null,
-      demoPhase: get().demoMode ? "Accuracy dropped — recalibration requested" : null,
+      demoPhase: get().demoMode ? "Accuracy dropped, recalibration requested" : null,
     });
     if (get().demoMode) {
       const t = setTimeout(() => {
@@ -280,7 +280,7 @@ function handleServerMsg(
     set({
       recalResult: msg,
       recalRequest: null,
-      demoPhase: get().demoMode ? "Accuracy recovered — stream resuming" : null,
+      demoPhase: get().demoMode ? "Accuracy recovered, stream resuming" : null,
     });
   }
 }

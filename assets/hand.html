@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MYO·HAND R2 — procedural myoelectric prosthetic (right)</title>
+<title>MYO·HAND R2, procedural myoelectric prosthetic (right)</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -98,7 +98,7 @@
 </div>
 
 <div class="hint">
-  drag orbit · scroll zoom<br/>d — debug panel · 1–9 poses
+  drag orbit · scroll zoom<br/>d, debug panel · 1-9 poses
 </div>
 
 <nav class="bar" id="debugBar">
@@ -148,7 +148,7 @@ scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 pmrem.dispose();
 
 // Orbit target is pushed to +X so the hand frames slightly LEFT of
-// center — the right side of the viewport stays empty for dashboards.
+// center, the right side of the viewport stays empty for dashboards.
 const camera = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 0.1, 60);
 camera.position.set(0.35, 0.75, 5.6);
 
@@ -161,7 +161,7 @@ controls.maxDistance = 11;
 controls.maxPolarAngle = 1.62;
 
 /* ================================================================
-   STUDIO LIGHTING — key + fill + rim
+   STUDIO LIGHTING, key + fill + rim
    ================================================================ */
 const key = new THREE.DirectionalLight(0xfff1de, 2.6);
 key.position.set(3.2, 7.0, 4.0);
@@ -183,7 +183,7 @@ scene.add(rim);
 scene.add(new THREE.HemisphereLight(0x9aa3b0, 0x15161a, 0.45));
 
 /* ================================================================
-   MATERIALS — composite shell / graphite / titanium / LEDs
+   MATERIALS, composite shell / graphite / titanium / LEDs
    ================================================================ */
 const shellMat   = new THREE.MeshStandardMaterial({ color: 0xe9e5dd, roughness: 0.42, metalness: 0.04, envMapIntensity: 0.55 });
 const shellMat2  = new THREE.MeshStandardMaterial({ color: 0xdfdacd, roughness: 0.48, metalness: 0.04, envMapIntensity: 0.50 });
@@ -214,7 +214,7 @@ function defineJoint(name, order, base) {
    BIONIC PART BUILDERS
    ================================================================ */
 // Hinge = graphite barrel (dark joint gap) + titanium pin protruding
-// on both sides — the "internal linkage" seen at every knuckle.
+// on both sides, the "internal linkage" seen at every knuckle.
 function hingeBarrel(r, span, pinSpan) {
   const g = new THREE.Group();
   const barrel = new THREE.Mesh(new THREE.CylinderGeometry(r, r, span, 24), graphite);
@@ -263,7 +263,7 @@ scene.add(stage);
 const handRoot = new THREE.Group();
 stage.add(handRoot);
 
-// forearm roll pivot (pronation/supination) — wrist-level, on the
+// forearm roll pivot (pronation/supination), wrist-level, on the
 // long axis, so cuff + rings twist together
 const roll = defineJoint('forearm_roll', ['y']);
 handRoot.add(roll);
@@ -309,7 +309,7 @@ roll.add(emitterLight);
 // The SOCKET (taper cone + ball) stays with the forearm and bridges
 // the cuff into the pivot with zero air gap; the HOUSING yoke goes
 // with the hand and nests into the ball, so at every wrist angle the
-// hand emerges from solid material — flexion reveals the ball
+// hand emerges from solid material, flexion reveals the ball
 // articulating in its yoke instead of a void.
 const wristCone = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.345, 0.30, 48), graphite);
 wristCone.position.y = -0.235;            // spans −0.385…−0.085, overlaps cuff top + ball
@@ -330,7 +330,7 @@ const wrist = defineJoint('wrist', ['x', 'z']);
 roll.add(wrist);
 
 // housing yoke: deep rounded box whose proximal end sits inside the
-// socket ball — its bottom rim (sweep radius ≤0.15) stays buried in
+// socket ball, its bottom rim (sweep radius ≤0.15) stays buried in
 // the ball (r 0.215) even at ±55°, so the joint never shows a hole.
 const wristHousing = new THREE.Mesh(new RoundedBoxGeometry(0.56, 0.36, 0.30, 4, 0.11), graphite);
 wristHousing.position.y = 0.05;           // spans −0.13…0.23, tucks under the palm shell
@@ -423,11 +423,11 @@ buildFinger('middle', -0.10, 1.035, [0.440, 0.290, 0.235], [0.170, 0.155, 0.145]
 buildFinger('ring',    0.10, 1.000, [0.410, 0.270, 0.220], [0.160, 0.147, 0.138]);
 buildFinger('pinky',   0.295, 0.930, [0.315, 0.205, 0.190], [0.145, 0.135, 0.128]);
 
-/* ---------- thumb: CMC (2-DOF) + IP — short, thick, 45° diagonal ---------- */
+/* ---------- thumb: CMC (2-DOF) + IP, short, thick, 45° diagonal ---------- */
 // Base frame: local Y = rest direction (out −X, forward +Z, 45° planar
 // sweep); local X = opposition axis chosen so the flexion curl plane
 // passes exactly through the index-fingertip contact zone (verified FK:
-// pinch tips land within ~0.13 u — pad contact).
+// pinch tips land within ~0.13 u, pad contact).
 const tY = new THREE.Vector3(-0.7227, 0.3011, 0.6223).normalize();
 const tZ = new THREE.Vector3( 0.6528, 0.5937, 0.4706).normalize();
 const tX = new THREE.Vector3().crossVectors(tY, tZ).normalize();
@@ -465,7 +465,7 @@ thumbIP.add(tSeg2);
 stage.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
 
 /* ================================================================
-   FLOOR — faint mirror reflection · soft cyan glow · shadow catcher
+   FLOOR, faint mirror reflection · soft cyan glow · shadow catcher
    ================================================================ */
 const FLOOR_Y = -1.68;
 
@@ -506,7 +506,7 @@ shadowCatcher.receiveShadow = true;
 shadowCatcher.renderOrder = 2;
 scene.add(shadowCatcher);
 
-// static soft cyan pool under the wrist — subtle, always on
+// static soft cyan pool under the wrist, subtle, always on
 const glow = new THREE.Mesh(
   new THREE.PlaneGeometry(3.1, 3.1),
   new THREE.MeshBasicMaterial({
@@ -538,7 +538,7 @@ confRing.renderOrder = 5;
 scene.add(confRing);
 
 /* ================================================================
-   POSE LIBRARY — joint angles in DEGREES · flexion positive
+   POSE LIBRARY, joint angles in DEGREES · flexion positive
    ----------------------------------------------------------------
    Channels (a bare number = primary axis):
      wrist          x = palmarflex (+) / extension (−)
@@ -553,7 +553,7 @@ scene.add(confRing);
    tripod make real pad contact and the fist stays intersection-free.
    ================================================================ */
 
-// relaxed resting curl — shared by the wrist-isolated poses
+// relaxed resting curl, shared by the wrist-isolated poses
 const RELAXED = {
   index_mcp:  { x: 14, z:  4 }, index_pip: 10, index_dip:  6,
   middle_mcp: { x: 12, z:  1 }, middle_pip:  8, middle_dip:  5,
@@ -564,10 +564,10 @@ const RELAXED = {
 
 const POSES = {
 
-  /* 01 — open rest: gentle fan, soft mechanical curl */
+  /* 01, open rest: gentle fan, soft mechanical curl */
   neutral: { wrist: 0, forearm_roll: 0, ...RELAXED },
 
-  /* 02 — power fist: fingers 90/100/60 (compact block), thumb wraps
+  /* 02, power fist: fingers 90/100/60 (compact block), thumb wraps
           low across the front of the finger stack */
   fist: {
     wrist: 0, forearm_roll: 0,
@@ -578,7 +578,7 @@ const POSES = {
     thumb_cmc:  { x: 60, z: 20 }, thumb_ip: 46,
   },
 
-  /* 03 — index extended straight, others fisted, thumb tucked under */
+  /* 03, index extended straight, others fisted, thumb tucked under */
   index_point: {
     wrist: 0, forearm_roll: 0,
     index_mcp:  { x:  3, z: 2 }, index_pip:  3, index_dip:  2,
@@ -588,7 +588,7 @@ const POSES = {
     thumb_cmc:  { x: 42, z: 10 }, thumb_ip: 46,
   },
 
-  /* 04 — tip pinch: index pad and thumb pad meet (FK-verified contact) */
+  /* 04, tip pinch: index pad and thumb pad meet (FK-verified contact) */
   pinch: {
     wrist: 0, forearm_roll: 0,
     index_mcp:  { x: 60, z: 2 }, index_pip: 68, index_dip: 25,
@@ -598,7 +598,7 @@ const POSES = {
     thumb_cmc:  { x: 42, z: 2 }, thumb_ip: 60,
   },
 
-  /* 05 — tripod / pen grip: thumb·index·middle tips converge on a
+  /* 05, tripod / pen grip: thumb·index·middle tips converge on a
           point; slight radial wrist deviation like a real pen hold */
   tripod: {
     wrist: { x: 2, z: 5 }, forearm_roll: 0,
@@ -609,10 +609,10 @@ const POSES = {
     thumb_cmc:  { x: 40, z: 6 }, thumb_ip: 48,
   },
 
-  /* 06 — palmarflexion: wrist folds toward the palm */
+  /* 06, palmarflexion: wrist folds toward the palm */
   wrist_flex: { wrist: { x: 55 }, forearm_roll: 0, ...RELAXED },
 
-  /* 07 — wrist extension, slight tenodesis coil in the fingers */
+  /* 07, wrist extension, slight tenodesis coil in the fingers */
   wrist_extend: {
     wrist: { x: -48 }, forearm_roll: 0,
     index_mcp:  { x: 16, z:  4 }, index_pip: 18, index_dip: 10,
@@ -622,15 +622,15 @@ const POSES = {
     thumb_cmc:  { x:  6, z: 10 }, thumb_ip:   8,
   },
 
-  /* 08 — pronation: thumb side rolls anteriorly (+85° about Y) */
+  /* 08, pronation: thumb side rolls anteriorly (+85° about Y) */
   pronation: { wrist: 0, forearm_roll: 85, ...RELAXED },
 
-  /* 09 — supination: reverse roll (−85°) */
+  /* 09, supination: reverse roll (−85°) */
   supination: { wrist: 0, forearm_roll: -85, ...RELAXED },
 };
 
 /* ================================================================
-   POSE ENGINE — normalize · 250 ms ease-in-out blend · queue-safe
+   POSE ENGINE, normalize · 250 ms ease-in-out blend · queue-safe
    ================================================================ */
 const BLEND_S = 0.25;
 
@@ -672,7 +672,7 @@ function applyRig(ch, t) {
 }
 
 /* ================================================================
-   window.HandRig — public API (stable contract)
+   window.HandRig, public API (stable contract)
    ================================================================ */
 let confTarget = 0.75, conf = 0;
 let actTarget = 0, act = 0;
@@ -695,7 +695,7 @@ window.HandRig = {
 
   // Direct control of one joint's primary axis. Optional 3rd arg
   // selects the axis: setJoint('wrist',-10,'z'), setJoint('forearm_roll',45,'y').
-  // Cancels any in-flight blend — manual control wins.
+  // Cancels any in-flight blend, manual control wins.
   setJoint(name, deg, axis) {
     const def = jointDefs[name];
     if (!def) { console.warn(`[HandRig] unknown joint "${name}"`); return false; }

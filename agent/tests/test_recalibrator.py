@@ -1,5 +1,5 @@
 """
-Tests for agent.recalibrator — interview question generation, sample
+Tests for agent.recalibrator, interview question generation, sample
 collection, and the full recalibrate() workflow (all against mocked
 myosignal streaming and a mocked agent.classify).
 """
@@ -59,7 +59,7 @@ class TestCollectTargetGestureWindows:
     non-target windows and keep scanning (bounded) until it finds enough."""
 
     def test_skips_leading_non_target_windows(self, patch_myosignal_stream):
-        # Target gesture 'fist' doesn't appear until window 40 — well past
+        # Target gesture 'fist' doesn't appear until window 40, well past
         # the first 30 windows of the fresh stream.
         other = [make_envelope(t_ms=i * 50, true_gesture="other_gesture") for i in range(40)]
         target = [make_envelope(t_ms=(40 + i) * 50, true_gesture="fist") for i in range(20)]
@@ -108,7 +108,7 @@ class TestRecalibrateGradesOnlyTargetWindows:
         monkeypatch.setattr(recalibrator, "myosignal_stream", fake_stream)
 
         async def fake_classify(envelope, *, history=None, profile=None, cost_tracker=None, api_key=None):
-            # Always predicts the target gesture — correct for target windows,
+            # Always predicts the target gesture, correct for target windows,
             # deliberately wrong for the leading 'pinch' windows so the old
             # (unfiltered) behavior would have scored acc_after == 0.0.
             return {
@@ -138,7 +138,7 @@ class TestRecalibrate:
         post_envelopes = [make_envelope(t_ms=1000 + i * 50, true_gesture="fist") for i in range(20)]
 
         # collect_recalibration_samples() and the post-recal window collector
-        # both stream from myosignal_stream — one call per phase, in order.
+        # both stream from myosignal_stream, one call per phase, in order.
         streams = iter([target_envelopes, post_envelopes])
 
         def fake_stream(subject, drift_at_s=None, drift_mode="electrode_shift"):

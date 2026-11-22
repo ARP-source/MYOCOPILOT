@@ -1,3 +1,3 @@
 """
-eval — offline benchmarks and report generation.
+eval, offline benchmarks and report generation.
 """

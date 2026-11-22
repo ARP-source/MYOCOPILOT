@@ -1,5 +1,5 @@
 """
-agent.profile_store — load and save per-user gesture profiles.
+agent.profile_store, load and save per-user gesture profiles.
 
 Each profile is a JSON file at gesture_profiles/<subject>.json containing
 few-shot spectrogram examples keyed by gesture name.

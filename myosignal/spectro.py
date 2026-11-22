@@ -1,5 +1,5 @@
 """
-myosignal.spectro — convert a sEMG window to a PNG spectrogram encoded as base64.
+myosignal.spectro, convert a sEMG window to a PNG spectrogram encoded as base64.
 
 Uses short-time Fourier transform (STFT) on each channel, stacks the magnitude
 spectrograms into an RGB image (channels mapped to colour), and returns the PNG

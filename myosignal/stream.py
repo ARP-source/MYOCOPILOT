@@ -1,5 +1,5 @@
 """
-myosignal.stream — public streaming API (CLAUDE.md contract).
+myosignal.stream, public streaming API (CLAUDE.md contract).
 
     myosignal.stream(subject: str, drift_at_s: float | None) -> Iterator[WindowEnvelope]
 

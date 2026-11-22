@@ -1,5 +1,5 @@
 """
-Tests for myosignal.player.apply_electrode_shift_stress — the severe,
+Tests for myosignal.player.apply_electrode_shift_stress, the severe,
 deterministic whole-array electrode-shift stress transform used for
 'electrode_shift' drift in the synthetic/replay path.
 """
@@ -32,7 +32,7 @@ class TestPermutation:
         assert sorted(_ELECTRODE_SHIFT_PERMUTATION.tolist()) == list(range(N_CHANNELS))
 
     def test_has_no_fixed_points(self):
-        """Every channel must move to a *different* position — a real
+        """Every channel must move to a *different* position, a real
         full electrode-cap remap, not a partial/no-op shift."""
         for i, dest in enumerate(_ELECTRODE_SHIFT_PERMUTATION):
             assert dest != i, f"channel {i} maps to itself"
@@ -65,7 +65,7 @@ class TestDeterminism:
         assert np.array_equal(out1, out2)
 
     def test_deterministic_regardless_of_global_rng_state(self):
-        """The transform must not depend on ambient numpy random state —
+        """The transform must not depend on ambient numpy random state,
         it's fully self-seeded."""
         window = _make_window(seed=2)
         np.random.seed(0)

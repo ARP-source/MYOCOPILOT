@@ -1,5 +1,5 @@
 """
-web.server — FastAPI application.
+web.server, FastAPI application.
 
 Endpoints
 ---------
@@ -32,7 +32,7 @@ app = FastAPI(title="MyoCopilot API")
 DEFAULT_SUBJECT = "DB2_s1"
 ENVELOPE_QUEUE_MAXSIZE = 5
 
-# Single active session — this demo serves one live dashboard at a time.
+# Single active session, this demo serves one live dashboard at a time.
 _current_session: Optional[Session] = None
 
 
@@ -71,7 +71,10 @@ async def ws_stream(websocket: WebSocket) -> None:
     2. Start the myosignal stream for the requested subject.
     3. For each WindowEnvelope:
        a. Call agent.classify() to get ClassifierResponse.
-       b. Update DriftDetector; compute rolling_accuracy_20.
+       b. Update DriftDetector; compute rolling_accuracy_20. Feed the
+          window's features to the label free FeatureDriftDetector, which
+          enrolls on the first 600 labeled windows (30 s) and then decides
+          whether drift is happening.
        c. Emit "classification" message.
        d. If drift detected, emit "recalibration_request" and pause stream.
        e. On "recal_ack", run recalibrator and emit "recalibration_result".
@@ -152,6 +155,8 @@ async def ws_stream(websocket: WebSocket) -> None:
                 notes=pred["notes"],
             )
 
+            session.observe_features(envelope)
+
             await websocket.send_json(
                 {
                     "type": "classification",
@@ -163,7 +168,7 @@ async def ws_stream(websocket: WebSocket) -> None:
                 }
             )
 
-            confusion_pair = check_drift(session.detector)
+            confusion_pair = check_drift(session.detector, session.feature_detector)
             if confusion_pair is not None:
                 target_gesture, confused_with = confusion_pair
                 question = await generate_interview_question(target_gesture, confused_with)

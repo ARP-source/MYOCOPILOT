@@ -1,5 +1,5 @@
 """
-myosignal.windows — sliding-window segmentation and per-channel feature extraction.
+myosignal.windows, sliding-window segmentation and per-channel feature extraction.
 
 Contract
 --------
@@ -41,8 +41,8 @@ class WindowBatch:
     Attributes
     ----------
     window        : float32 array (window_samples, N_CHANNELS).
-    rms           : float32 array (N_CHANNELS,) — per-channel RMS.
-    zero_crossings: int32 array   (N_CHANNELS,) — per-channel ZC count.
+    rms           : float32 array (N_CHANNELS,), per-channel RMS.
+    zero_crossings: int32 array   (N_CHANNELS,), per-channel ZC count.
     label_int     : dominant integer gesture index in this window.
     label_name    : POSE_SET string ('' if unknown).
     rep           : dominant repetition number.
@@ -133,9 +133,9 @@ def segment(
     Parameters
     ----------
     emg         : preprocessed float32 array (n_samples, N_CHANNELS).
-    labels      : optional int32 array (n_samples,) — gesture index per sample.
-    label_names : optional str array (n_samples,) — POSE_SET name per sample.
-    reps        : optional int32 array (n_samples,) — repetition per sample.
+    labels      : optional int32 array (n_samples,), gesture index per sample.
+    label_names : optional str array (n_samples,), POSE_SET name per sample.
+    reps        : optional int32 array (n_samples,), repetition per sample.
     fs          : sampling rate in Hz.
 
     Returns

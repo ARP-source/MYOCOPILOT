@@ -1,5 +1,5 @@
 """
-agent.mock_classifier — network-free, deterministic per-subject prototype
+agent.mock_classifier, network-free, deterministic per-subject prototype
 classifier, selected via MOCK=1 (see agent/__init__.py's dispatch).
 
 This is NOT the real gesture classifier. agent.classifier.classify() is the
@@ -7,7 +7,7 @@ real path: it sends the WindowEnvelope's spectrogram PNG to GLM-5.3-Flash
 over OpenRouter and asks a general-purpose multimodal LLM to judge the
 visual spectral pattern, optionally comparing it against few-shot reference
 images from the subject's gesture_profiles/*.json. This module never makes
-a network call and never looks at spectrogram_png_b64 — it classifies
+a network call and never looks at spectrogram_png_b64, it classifies
 purely from the WindowEnvelope's numeric features (features.rms,
 features.zero_crossings), so MOCK=1 replay (the live dashboard demo and the
 eval/ harness) never depends on network access or an OpenRouter API key.
@@ -24,31 +24,31 @@ nearest-prototype classifier is built up in two phases:
    reference-example set per gesture. Enrollment only fires a few windows
    into a label run (ENROLL_SETTLE_WINDOWS), never on the first,
    boundary-contaminated window of a run, and at most once per run, up to
-   PROTO_CAP examples per gesture — "a small deterministic warm-up
+   PROTO_CAP examples per gesture, "a small deterministic warm-up
    reference set for every available gesture". The subject stays in
    warm-up (not "ready") until at least MIN_DISTINCT_GESTURES_READY
    distinct gestures have reached MIN_SAMPLES_PER_GESTURE examples; only
    envelope["true_gesture"] ever drives enrollment, never this module's
    own prediction. While warming up, classify() never triggers drift
    (drift_suspected is always False) and communicates the not-ready state
-   through the existing `notes` field — no new contract fields.
+   through the existing `notes` field, no new contract fields.
 
 2. Inference
    For every window (labeled or not), the raw feature vector is
    normalised with the frozen bootstrap statistics and compared against
    every enrolled gesture's stored examples; the nearest example's gesture
-   wins. envelope["true_gesture"] is NEVER returned as the prediction —
+   wins. envelope["true_gesture"] is NEVER returned as the prediction,
    only used (above) to decide what to enroll. Confidence comes from the
    margin between the nearest and second-nearest match, relative to the
    population's typical match distance; drift_suspected flags a match
    that is unfamiliar (far from anything ever enrolled) or a confidence
-   collapse — not merely "a label happened to be attached".
+   collapse, not merely "a label happened to be attached".
 
 3. Recalibration
    agent.recalibrator.recalibrate() feeds exactly the 3 confirmed windows
    of the target gesture to enroll_confirmed_samples(), which REPLACES
    that gesture's stored examples outright (a deterministic reset, not a
-   blend) and refreshes its audit metadata — see get_profile_snapshot().
+   blend) and refreshes its audit metadata, see get_profile_snapshot().
 """
 
 from __future__ import annotations
@@ -74,7 +74,7 @@ WARMUP_CONFIDENCE = 0.55
 DEFAULT_GESTURE = "neutral"
 
 WARMUP_NOTE = (
-    "mock classifier (MOCK=1): warm-up — building per-subject reference "
+    "mock classifier (MOCK=1): warm-up, building per-subject reference "
     "profile from clean bootstrap windows, not yet scoring"
 )
 
@@ -193,7 +193,7 @@ class _SubjectState:
 
     def _is_settled_sample(self, true_gesture: str) -> bool:
         """True on the ENROLL_SETTLE_WINDOWS-th consecutive window of a label
-        run — skips the boundary-contaminated first windows of a run and
+        run, skips the boundary-contaminated first windows of a run and
         enrolls at most once per run."""
         if true_gesture != self._last_true_gesture:
             self._run_length = 0
@@ -227,7 +227,7 @@ class _SubjectState:
 
     def enroll_confirmed(self, gesture: str, raw_vectors: list[list[float]]) -> None:
         """Recalibration hook: REPLACE *gesture*'s reference examples with
-        exactly *raw_vectors* — a deterministic reset, not a blend."""
+        exactly *raw_vectors*, a deterministic reset, not a blend."""
         if not self.ready:
             # No bootstrap has completed yet; seed it with these confirmed samples too.
             for v in raw_vectors:
@@ -293,7 +293,7 @@ def _get_state(subject: str) -> _SubjectState:
 def reset_subject(subject: str) -> None:
     """Drop all learned state for *subject*, forcing a fresh bootstrap.
 
-    Not part of the WebSocket/HTTP contract — a test/demo utility only.
+    Not part of the WebSocket/HTTP contract, a test/demo utility only.
     """
     _subjects.pop(subject, None)
 
@@ -301,7 +301,7 @@ def reset_subject(subject: str) -> None:
 def get_profile_snapshot(subject: str) -> dict:
     """Auditable snapshot of *subject*'s per-gesture reference profile:
     centroid, sample_count, dispersion, and calibration metadata per
-    gesture. Not part of the WebSocket/HTTP contract — for inspection,
+    gesture. Not part of the WebSocket/HTTP contract, for inspection,
     debugging, and tests only.
     """
     state = _subjects.get(subject)
@@ -316,7 +316,7 @@ def get_profile_snapshot(subject: str) -> dict:
 def enroll_confirmed_samples(subject: str, gesture: str, envelopes: list[WindowEnvelope]) -> None:
     """agent.recalibrator's hook: replace *gesture*'s reference examples with
     the confirmed *envelopes* it just collected (fresh, undrifted windows of
-    the confused gesture) — see the module docstring's Recalibration section.
+    the confused gesture), see the module docstring's Recalibration section.
     A no-op if *envelopes* is empty.
     """
     vectors = [_feature_vector(e) for e in envelopes]
@@ -333,7 +333,7 @@ async def classify(
     api_key: str | None = None,
 ) -> ClassifierResponse:
     """
-    Classify *envelope* from its RMS/zero-crossing features alone — no
+    Classify *envelope* from its RMS/zero-crossing features alone, no
     network call, no spectrogram image, never envelope["true_gesture"] as
     the prediction. See the module docstring for the bootstrap / inference /
     recalibration design.

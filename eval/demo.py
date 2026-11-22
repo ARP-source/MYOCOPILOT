@@ -1,8 +1,8 @@
 """
-eval.demo — headless, deterministic, MOCK=1 walkthrough of the full pipeline.
+eval.demo, headless, deterministic, MOCK=1 walkthrough of the full pipeline.
 
-Drives the *actual* production code path end to end — myosignal.SessionPlayer,
-agent.classify, agent.drift_detector.check_drift, agent.recalibrator — the
+Drives the *actual* production code path end to end, myosignal.SessionPlayer,
+agent.classify, agent.drift_detector.check_drift, agent.recalibrator, the
 same functions web/server.py's WebSocket handler calls, just printed to the
 console instead of pushed over a socket. No browser, no OpenRouter key: MOCK
 is forced to "1" before agent is imported, so classification always goes
@@ -75,7 +75,7 @@ def _log(t0: float, msg: str) -> None:
 
 
 async def run_demo() -> None:
-    print("MyoCopilot headless demo — MOCK=1, no browser, no OpenRouter key required.\n")
+    print("MyoCopilot headless demo, MOCK=1, no browser, no OpenRouter key required.\n")
     print("Target presentation timeline (talking points for a live demo):")
     for t, label in TARGET_TIMELINE:
         print(f"  {t:>3}s  {label}")
@@ -85,7 +85,7 @@ async def run_demo() -> None:
     player = SessionPlayer(subject=DEMO_SUBJECT, source="synthetic", seed=DEMO_SEED)
     # The drift detector is only instantiated once the electrode-shift artefact
     # actually starts, so its rolling accuracy window judges drift-affected
-    # windows on their own terms — the network-free mock heuristic's baseline
+    # windows on their own terms, the network-free mock heuristic's baseline
     # accuracy already sits under DriftDetector's 60% threshold even on clean
     # signal, so a detector fed from t=0 would (correctly, if confusingly for
     # a live narration) flag "drift" before the artefact is even injected.
@@ -115,7 +115,7 @@ async def run_demo() -> None:
             pair = check_drift(detector)
             if pair is not None:
                 target_gesture, confused_with = pair
-                _log(t0, f"drift detected — confusing '{target_gesture}' with '{confused_with}'")
+                _log(t0, f"drift detected, confusing '{target_gesture}' with '{confused_with}'")
 
                 question = await generate_interview_question(target_gesture, confused_with)
                 _log(t0, f'conversational recalibration request: "{question}"')
@@ -127,7 +127,7 @@ async def run_demo() -> None:
                 _log(t0, f"gesture profile updated (gesture_profiles/{DEMO_SUBJECT}.json)")
                 _log(
                     t0,
-                    f"recovery confirmed — rolling accuracy before={result['acc_before']:.2f} "
+                    f"recovery confirmed, rolling accuracy before={result['acc_before']:.2f} "
                     f"after={result['acc_after']:.2f}",
                 )
                 recal_done = True

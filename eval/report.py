@@ -1,5 +1,5 @@
 """
-eval.report — generate publication-quality figures from eval/results.json.
+eval.report, generate publication-quality figures from eval/results.json.
 
 Reads eval/results.json (produced by `python -m eval.run`) and, if present,
 eval/baseline_results.json (produced by `python -m eval.baselines`), and
@@ -12,7 +12,7 @@ writes dark-on-light PNG figures suitable for slides to eval/report/:
     baseline_comparison.png      classical k-NN baseline vs MyoCopilot mock path
 
 Every figure's title states plainly whether the underlying data is real or
-synthetic_demo_data — never silently omitted. Drift figures additionally
+synthetic_demo_data, never silently omitted. Drift figures additionally
 describe the "electrode_shift" condition as a structured synthetic
 electrode-shift STRESS TEST (myosignal.player.apply_electrode_shift_stress):
 not a clinical or biomechanical model, and not clinical validation of
@@ -55,7 +55,7 @@ plt.rcParams.update(
 
 def _load_results() -> dict:
     if not RESULTS_PATH.exists():
-        raise SystemExit(f"{RESULTS_PATH} not found — run `python -m eval.run` first.")
+        raise SystemExit(f"{RESULTS_PATH} not found, run `python -m eval.run` first.")
     return json.loads(RESULTS_PATH.read_text())
 
 
@@ -125,7 +125,7 @@ def plot_confusion_matrices(results: dict, out_path: Path) -> None:
                         ax.text(j, i, str(v), ha="center", va="center", fontsize=5, color=color)
 
     fig.suptitle(
-        "MyoCopilot offline evaluation — confusion matrices (agent.mock_classifier, MOCK path)",
+        "MyoCopilot offline evaluation, confusion matrices (agent.mock_classifier, MOCK path)",
         fontsize=13,
         fontweight="bold",
     )
@@ -162,11 +162,11 @@ def plot_accuracy_vs_time(results: dict, out_path: Path) -> None:
         ax.set_ylim(-0.02, 1.02)
         ax.set_xlabel("window index (50 ms stride)")
         ax.set_ylabel("rolling accuracy")
-        ax.set_title(f"{subject} [{run['data_source']}] — drift_plus_recalibration", fontsize=10)
+        ax.set_title(f"{subject} [{run['data_source']}], drift_plus_recalibration", fontsize=10)
         ax.legend(fontsize=7, loc="lower left")
 
     fig.suptitle(
-        "Accuracy vs. time — structured synthetic electrode-shift stress test\n"
+        "Accuracy vs. time, structured synthetic electrode-shift stress test\n"
         "(drift and recalibration markers; synthetic_demo_data, not clinical validation)",
         fontsize=12.5,
         fontweight="bold",
@@ -178,18 +178,18 @@ def plot_accuracy_vs_time(results: dict, out_path: Path) -> None:
 
 def plot_recalibration_before_after(results: dict, out_path: Path) -> None:
     """
-    Per-gesture accuracy before vs. after recalibration — explicitly
+    Per-gesture accuracy before vs. after recalibration, explicitly
     distinguishing two different recovery metrics that are easy to conflate:
 
-      OVERALL rolling accuracy  — post_drift_accuracy -> post_recalibration_accuracy,
+      OVERALL rolling accuracy, post_drift_accuracy -> post_recalibration_accuracy,
                                   averaged across every gesture in that window.
-      CALIBRATED TARGET gesture — the specific confused gesture's own before/after
+      CALIBRATED TARGET gesture, the specific confused gesture's own before/after
                                   accuracy (gesture_accuracy_before_after_recalibration),
                                   i.e. what the 3-sample recalibration flow actually
                                   targeted and replaced the reference profile for.
 
     The target gesture typically recovers further/faster than the overall
-    average, since recalibration only replaces *its* profile — see the
+    average, since recalibration only replaces *its* profile, see the
     boxed summary and the highlighted bar pair on each subject's chart.
     """
     subjects = _subjects(results)
@@ -225,7 +225,7 @@ def plot_recalibration_before_after(results: dict, out_path: Path) -> None:
         ax.set_xticklabels(labels, rotation=30, ha="right", fontsize=8)
         ax.set_ylim(0, 1.18)
         ax.set_ylabel("accuracy")
-        ax.set_title(f"{subject} [{run['data_source']}] — blue outline = calibrated target gesture", fontsize=9.5)
+        ax.set_title(f"{subject} [{run['data_source']}], blue outline = calibrated target gesture", fontsize=9.5)
         ax.legend(fontsize=8, loc="upper left")
 
         target_before = pre_post.get(target_gesture, {}).get("before") if target_gesture else None
@@ -248,8 +248,8 @@ def plot_recalibration_before_after(results: dict, out_path: Path) -> None:
         )
 
     fig.suptitle(
-        "Per-gesture accuracy before vs. after recalibration — synthetic_demo_data\n"
-        "structured synthetic electrode-shift stress test, not clinical validation — "
+        "Per-gesture accuracy before vs. after recalibration, synthetic_demo_data\n"
+        "structured synthetic electrode-shift stress test, not clinical validation, "
         "overall rolling accuracy and the calibrated target gesture's own recovery are reported separately (see boxed summary per subject)",
         fontsize=11,
         fontweight="bold",
@@ -281,7 +281,7 @@ def plot_cost_token_summary(results: dict, out_path: Path) -> None:
             cell.set_facecolor("#1f6feb")
 
     ax.set_title(
-        "Token / cost summary — estimated real-API cost, not measured (MOCK path makes no API calls)",
+        "Token / cost summary, estimated real-API cost, not measured (MOCK path makes no API calls)",
         fontsize=12, fontweight="bold", pad=12,
     )
     fig.savefig(out_path, dpi=DPI, bbox_inches="tight")
@@ -306,7 +306,7 @@ def plot_baseline_comparison(baselines: dict, out_path: Path) -> None:
     ax.set_ylabel("accuracy")
     ax.legend(fontsize=9)
     ax.set_title(
-        "Classical baseline comparison — sanity check, not a superiority claim\n"
+        "Classical baseline comparison, sanity check, not a superiority claim\n"
         f"({baselines['note']})",
         fontsize=10, fontweight="bold", wrap=True,
     )
@@ -329,7 +329,7 @@ def main() -> None:
     if baselines is not None:
         plot_baseline_comparison(baselines, OUT_DIR / "baseline_comparison.png")
     else:
-        print("eval/baseline_results.json not found — skipping baseline_comparison.png "
+        print("eval/baseline_results.json not found, skipping baseline_comparison.png "
               "(run `python -m eval.baselines` first to include it)")
 
     print(f"Wrote figures to {OUT_DIR}/")

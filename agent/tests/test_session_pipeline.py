@@ -10,7 +10,7 @@ stay exactly as specified in CLAUDE.md.
 Drift itself is simulated at the classification-outcome level (a run of
 wrong predictions, standing in for what electrode_shift would cause a real
 classifier to produce) rather than by replaying real sEMG through
-myosignal.drift — that module is myosignal's contract to fulfil, not
+myosignal.drift, that module is myosignal's contract to fulfil, not
 agent's; agent only needs to react correctly to the (true, pred) stream it
 is handed.
 """
@@ -50,7 +50,7 @@ def test_full_session_clean_then_drift_then_recalibration(
 ):
     detector = DriftDetector(window_size=20, accuracy_threshold=0.60)
 
-    # --- Phase 1: clean session — classifier tracks the true gesture well ---
+    # --- Phase 1: clean session, classifier tracks the true gesture well ---
     clean_resp = {"gesture": "fist", "confidence": 0.92, "drift_suspected": False, "notes": "clean"}
     _assert_classifier_response_shape(clean_resp)
     for _ in range(60):
@@ -59,7 +59,7 @@ def test_full_session_clean_then_drift_then_recalibration(
     assert check_drift(detector) is None
     assert detector.rolling_accuracy() == 1.0
 
-    # --- Phase 2: electrode_shift-style drift — classifier starts confusing
+    # --- Phase 2: electrode_shift-style drift, classifier starts confusing
     #     fist with pinch and loses confidence ---
     drift_resp = {"gesture": "pinch", "confidence": 0.3, "drift_suspected": True, "notes": "confused"}
     _assert_classifier_response_shape(drift_resp)
@@ -69,7 +69,7 @@ def test_full_session_clean_then_drift_then_recalibration(
     pair = check_drift(detector)
     assert pair == ("fist", "pinch"), "drift must be detected and the confused pair identified"
 
-    # --- Phase 3: recalibration — fresh 'fist' samples collected, profile
+    # --- Phase 3: recalibration, fresh 'fist' samples collected, profile
     #     updated, and the next 20 windows classify correctly again ---
     target_gesture, confused_with = pair
     fresh_samples = [make_envelope(t_ms=i * 50, true_gesture=target_gesture) for i in range(3)]
@@ -111,5 +111,5 @@ def test_full_session_clean_then_drift_then_recalibration(
     profile = profile_store.load_profile("test_subj")
     assert len(profile["gestures"][target_gesture]["examples"]) == 3
 
-    # Debounce holds — no immediate re-trigger right after recalibration.
+    # Debounce holds, no immediate re-trigger right after recalibration.
     assert check_drift(detector) is None

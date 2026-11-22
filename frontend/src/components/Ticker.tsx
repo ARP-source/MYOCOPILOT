@@ -14,7 +14,7 @@ export function Ticker() {
           {items.map((entry) => (
             <li key={entry.key} className={entry.correct ? "ticker__row ticker__row--ok" : "ticker__row ticker__row--bad"}>
               <span className="ticker__indicator">{entry.correct ? "✓" : "✗"}</span>
-              <span className="ticker__true">{entry.true_gesture ?? "—"}</span>
+              <span className="ticker__true">{entry.true_gesture ?? ", "}</span>
               <span className="ticker__arrow">→</span>
               <span className="ticker__pred">{entry.pred_gesture}</span>
               <span className="ticker__conf">{(entry.confidence * 100).toFixed(0)}%</span>

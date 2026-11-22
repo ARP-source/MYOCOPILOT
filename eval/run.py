@@ -1,5 +1,5 @@
 """
-eval.run — offline end-to-end evaluation harness.
+eval.run, offline end-to-end evaluation harness.
 
 Runs 3 subjects x {clean, drift, drift_plus_recalibration} entirely offline
 and writes structured results to eval/results.json. Never touches the
@@ -11,7 +11,7 @@ script is safe to run anywhere.
 
 All results here come from myosignal.loaders.make_synthetic_session's
 structured, deliberately-engineered synthetic EMG-like signals
-("synthetic_demo_data") — never real NinaPro/emg2pose recordings unless
+("synthetic_demo_data"), never real NinaPro/emg2pose recordings unless
 files are dropped under data/. Nothing here is clinical validation.
 
 Data
@@ -30,11 +30,11 @@ clean
 
 drift
     For DRIFT_MODE == "electrode_shift" (the default), a structured
-    synthetic electrode-shift STRESS TEST — myosignal.player's
+    synthetic electrode-shift STRESS TEST, myosignal.player's
     apply_electrode_shift_stress: a deterministic whole-12-channel
     permutation, a fixed per-channel gain (0.45x-1.70x), small
     channel-dependent baseline wander/contact noise, and two channels
-    losing most contact — injected starting ~35% into the session. (Other
+    losing most contact, injected starting ~35% into the session. (Other
     DRIFT_MODE values still go through the milder, localized
     myosignal.drift.inject_drift.) Accuracy is reported before (baseline)
     and after (post_drift) the injection point. No recalibration happens,
@@ -46,7 +46,7 @@ drift_plus_recalibration
     windows of the confused gesture are pulled from the ORIGINAL undrifted
     session (mirroring agent.recalibrator.recalibrate(), which always starts
     a *fresh* myosignal stream to collect both the reference examples and
-    the post-recalibration windows — never the still-drifted live stream)
+    the post-recalibration windows, never the still-drifted live stream)
     and fed to agent.mock_classifier.enroll_confirmed_samples(), which
     replaces the confused gesture's reference profile exactly as the real
     conversational recalibration flow does. Classification then continues
@@ -54,11 +54,11 @@ drift_plus_recalibration
     gesture_accuracy_before_after_recalibration reports the confused
     gesture's OWN before/after accuracy (the calibrated-target recovery);
     post_recalibration_accuracy is the OVERALL rolling accuracy across all
-    gestures in that same tail — these can differ (see eval/report.py).
+    gestures in that same tail, these can differ (see eval/report.py).
 
 Run with:
     python -m eval.run
-    MOCK=1 python -m eval.run    (MOCK is accepted but irrelevant — see above)
+    MOCK=1 python -m eval.run    (MOCK is accepted but irrelevant, see above)
 """
 
 from __future__ import annotations
@@ -105,7 +105,7 @@ ROLLING_WINDOW = 20            # matches agent.drift_detector.DriftDetector defa
 
 # Rough per-call token footprint of a real GLM-5.3-Flash classify() request
 # (one 512px-wide multimodal spectrogram image + short text context/response).
-# This run never calls the API — these are estimates for planning API cost,
+# This run never calls the API, these are estimates for planning API cost,
 # not measurements. See agent/cost_tracker.py for the pricing constants.
 EST_INPUT_TOKENS_PER_WINDOW = 1150
 EST_OUTPUT_TOKENS_PER_WINDOW = 40
@@ -167,7 +167,7 @@ async def _classify_batches(
     detector = DriftDetector(window_size=ROLLING_WINDOW)
     # A second detector, only instantiated once drift injection actually
     # starts, so the accuracy-threshold trigger judges drift-affected
-    # windows on their own terms — not on whatever rolling accuracy the
+    # windows on their own terms, not on whatever rolling accuracy the
     # classifier accumulated during its own early bootstrap/warm-up phase
     # (agent.mock_classifier only starts real nearest-prototype scoring
     # after a short warm-up; that warm-up's forced "neutral" guesses would
@@ -201,7 +201,7 @@ async def _classify_batches(
             zc = batch.zero_crossings
         else:
             if DRIFT_MODE == "electrode_shift":
-                # Severe, deterministic whole-array electrode-cap remap — see
+                # Severe, deterministic whole-array electrode-cap remap, see
                 # myosignal.player.apply_electrode_shift_stress's module comment.
                 # A structured synthetic electrode-shift STRESS TEST, not a
                 # clinical/biomechanical model.
@@ -451,7 +451,7 @@ async def run() -> dict:
             "RMS heuristic), independent of the MOCK env var, so this file "
             "never reflects real GLM-5.3-Flash accuracy. estimated_tokens/"
             "estimated_cost_usd are projections for the real API, not "
-            "measurements — see eval/run.py module docstring."
+            "measurements, see eval/run.py module docstring."
         ),
         "pose_set": POSE_SET,
         "conditions": CONDITIONS,
@@ -462,7 +462,7 @@ async def run() -> dict:
 
 
 def main() -> None:
-    print(f"MyoCopilot offline evaluation — {N_SUBJECTS} subjects x {len(CONDITIONS)} conditions")
+    print(f"MyoCopilot offline evaluation, {N_SUBJECTS} subjects x {len(CONDITIONS)} conditions")
     results = asyncio.run(run())
     RESULTS_PATH.parent.mkdir(parents=True, exist_ok=True)
     with RESULTS_PATH.open("w", encoding="utf-8") as f:

@@ -1,5 +1,5 @@
 """
-agent.classifier — call GLM-5.3-Flash via OpenRouter to classify a WindowEnvelope.
+agent.classifier, call GLM-5.3-Flash via OpenRouter to classify a WindowEnvelope.
 
 The spectrogram PNG is sent as a base64 image in the multimodal message.
 The model is prompted to return a JSON ClassifierResponse.
@@ -38,7 +38,7 @@ frequency spread. If reference examples are attached, compare the pattern agains
 them first. Respond ONLY with JSON: {"gesture": <str>, "confidence": <0.0-1.0>,
 "drift_suspected": <bool>, "notes": <one sentence>}. Set drift_suspected to true when
 the pattern matches none of the classes well or clearly differs from the session's
-established pattern. Be decisive — a prosthetic hand is waiting on you."""
+established pattern. Be decisive, a prosthetic hand is waiting on you."""
 
 
 def _select_reference_examples(
@@ -86,7 +86,7 @@ def _build_messages(
     ]
 
     for gesture_name, png_b64 in _select_reference_examples(profile):
-        content.append({"type": "text", "text": f"Reference — {gesture_name}:"})
+        content.append({"type": "text", "text": f"Reference, {gesture_name}:"})
         content.append(
             {
                 "type": "image_url",

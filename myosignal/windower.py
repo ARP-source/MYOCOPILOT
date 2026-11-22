@@ -1,5 +1,5 @@
 """
-myosignal.windower — sliding-window segmentation and feature extraction.
+myosignal.windower, sliding-window segmentation and feature extraction.
 
 Produces fixed-length overlapping windows from a raw sEMG array and
 computes per-channel RMS and zero-crossing rate.

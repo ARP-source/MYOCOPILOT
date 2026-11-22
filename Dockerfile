@@ -1,13 +1,13 @@
-# MyoCopilot — single-container deployment (e.g. Zeabur).
+# MyoCopilot, single-container deployment (e.g. Zeabur).
 #
 # Stage 1 builds the React/Vite frontend. Stage 2 installs Python
 # dependencies and serves both the FastAPI backend (WS /stream, /history,
 # /stats) and the built frontend from one uvicorn process on one port, via
 # serve.py (which mounts frontend/dist/ onto the existing web.server app
-# without modifying it — see serve.py's docstring).
+# without modifying it, see serve.py's docstring).
 #
 # Reads OPENROUTER_API_KEY only from the environment (never baked into the
-# image) and defaults safely to MOCK=1 whenever no key is supplied — see
+# image) and defaults safely to MOCK=1 whenever no key is supplied, see
 # docker-entrypoint.sh.
 
 # ---- Stage 1: frontend build -------------------------------------------

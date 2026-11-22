@@ -1,5 +1,5 @@
 """
-agent — classifier, drift detection, conversational recalibration, cost tracking.
+agent, classifier, drift detection, conversational recalibration, cost tracking.
 
 Public API:
     classify(envelope) -> ClassifierResponse

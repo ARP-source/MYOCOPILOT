@@ -1,5 +1,5 @@
 """
-myosignal.__main__ — CLI entry point.
+myosignal.__main__, CLI entry point.
 
 Usage
 -----
@@ -99,7 +99,7 @@ def main(argv: list[str] | None = None) -> None:
             break
 
         # --- Print trace line ---
-        true_g   = env["true_gesture"] or "—"
+        true_g   = env["true_gesture"] or ", "
         max_rms  = max(env["features"]["rms"])
         drifting = "*" if (
             args.drift_at is not None
@@ -119,7 +119,7 @@ def main(argv: list[str] | None = None) -> None:
 
         # --- Bypass real-time sleep if requested ---
         # (player.stream() already sleeps; we can't easily skip it without
-        #  re-implementing iteration — use --no-realtime as a hint only for
+        #  re-implementing iteration, use --no-realtime as a hint only for
         #  now; a future version will pass this flag to SessionPlayer)
 
     elapsed = time.monotonic() - t_start

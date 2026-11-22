@@ -1,5 +1,5 @@
 """
-eval.bench — offline accuracy and latency benchmark.
+eval.bench, offline accuracy and latency benchmark.
 
 Replays a full subject recording through the classifier without real-time
 throttling and reports per-gesture accuracy, mean latency, and total API cost.

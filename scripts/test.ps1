@@ -1,4 +1,4 @@
-# MyoCopilot test suite — Python tests + frontend build.
+# MyoCopilot test suite, Python tests + frontend build.
 $ErrorActionPreference = "Stop"
 
 py -m pytest

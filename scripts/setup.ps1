@@ -1,4 +1,4 @@
-# MyoCopilot setup — installs Python and frontend dependencies.
+# MyoCopilot setup, installs Python and frontend dependencies.
 $ErrorActionPreference = "Stop"
 
 py -m pip install -r requirements.txt

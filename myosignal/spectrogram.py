@@ -1,5 +1,5 @@
 """
-myosignal.spectrogram — convert a sEMG window to a base64-encoded PNG spectrogram.
+myosignal.spectrogram, convert a sEMG window to a base64-encoded PNG spectrogram.
 
 Design
 ------
@@ -21,7 +21,7 @@ from typing import Optional
 import numpy as np
 from scipy.signal import stft
 
-# Grid layout — must multiply to N_CHANNELS == 12
+# Grid layout, must multiply to N_CHANNELS == 12
 GRID_COLS: int = 4
 GRID_ROWS: int = 3
 
@@ -55,7 +55,7 @@ def compute_session_ref_db(
 
     Parameters
     ----------
-    emg        : float32 array (n_samples, n_channels) — entire or partial session.
+    emg        : float32 array (n_samples, n_channels), entire or partial session.
     fs         : sampling rate in Hz.
     nperseg    : STFT window length.
     noverlap   : STFT overlap.
@@ -63,7 +63,7 @@ def compute_session_ref_db(
 
     Returns
     -------
-    ref_db : float — maximum dB power across all channels in the sample.
+    ref_db : float, maximum dB power across all channels in the sample.
     """
     # Use a representative middle slice to avoid transients at the boundaries
     n = min(emg.shape[0], sample_cap)

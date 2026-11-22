@@ -15,7 +15,7 @@ export interface HandSceneProps {
  * in react-three-fiber would risk drifting from that visual, so it is
  * embedded in a sandboxed <iframe> and driven via postMessage against its
  * window.HandRig.{setPose,setConfidence,setActivation} contract. Callers
- * of HandScene don't need to know it's iframe-based — this is the only
+ * of HandScene don't need to know it's iframe-based, this is the only
  * file that would change if the rig were ever ported natively.
  */
 export function HandScene({ gesture, confidence, activation }: HandSceneProps) {
