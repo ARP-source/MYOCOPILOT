@@ -1,252 +1,97 @@
 # MyoCopilot
 
-**An adaptive myoelectric prosthetic-control copilot that detects EMG drift and conversationally recalibrates before control fails.**
+Surface EMG prosthetic control gets worse over a day. Electrodes slide, skin gets sweaty, the socket rotates a few degrees, and a gesture classifier that worked in the morning starts confusing a fist with a rest pose. Most systems just fail quietly. The user only finds out when the hand stops doing what they meant.
 
-Hackathon build — research prototype, not a medical device. See [Limitations](#limitations).
+I built MyoCopilot to try the opposite: watch for drift while the hand is in use, figure out which gesture broke, ask the user for a few fresh examples of that gesture, and update their profile on the spot.
 
----
+This is a prototype I built for a hackathon in August 2026. It is not a medical device, and the numbers below come from synthetic data, not people. More on that in [Limitations](#limitations).
 
-## The problem
+## How it works
 
-Surface EMG (sEMG) control signals for a prosthetic hand drift over the course of a day: electrodes shift position, sweat degrades skin-electrode contact, a harness rotates. A gesture classifier trained (or few-shot primed) on a clean signal quietly starts misfiring, and the user is left fighting a hand that no longer does what they intend — with no easy way to tell the system what changed.
+1. **Stream.** EMG is replayed as if it were live, cut into 250 ms windows with a 50 ms stride. Each window gets RMS and zero crossing features plus a spectrogram image.
+2. **Classify.** Each window is classified into one of 9 gestures (rest, fist, index point, pinch, tripod, wrist flex, wrist extend, pronation, supination).
+3. **Detect drift.** A detector tracks rolling accuracy and which pairs of gestures keep getting confused. It flags drift when accuracy drops under 0.60 or one confusion pair takes over 25% of recent windows.
+4. **Recalibrate.** The agent names the gesture that is failing, asks for 3 new repetitions of it, adds them to that user's gesture profile, and keeps going.
 
-## What MyoCopilot does
+A React dashboard shows rolling accuracy, a confusion matrix and the recalibration prompt, and a Three.js hand mirrors the predicted gesture.
 
-Public sEMG datasets (NinaPro DB2 `.mat` files, Meta emg2pose mini HDF5) are replayed as a simulated live stream, windowed, turned into spectrogram images, and classified by GLM-5.3-Flash via OpenRouter. A drift detector watches rolling accuracy and confusion patterns; when it suspects drift, the agent **asks the user** to perform the confused gesture a few times, folds the fresh spectrogram examples into that user's gesture profile, and keeps going — recalibrating conversationally instead of failing silently.
+There are two classifiers:
 
-**User experience:** stream → classify → detect drift → ask for calibration samples → personalize gesture profile → recover control.
+- **Default (`MOCK=1`):** a nearest prototype classifier on the RMS and zero crossing features. No network, deterministic, and it is what every result in this README uses.
+- **Experimental:** sends the spectrogram image to a multimodal LLM (GLM-5.3-Flash through OpenRouter) with a few reference images from the user's profile. I wanted to see if a general vision model could read EMG spectrograms at all. I have not evaluated it properly, so I make no accuracy claims for it.
 
-A 3-D hand (`assets/hand.html`, procedural Three.js) mirrors recognized gestures live; a React dashboard shows rolling accuracy, a confusion matrix, and running API cost.
+## Results (synthetic data)
 
-## Architecture
+3 synthetic subjects, about 1,400 windows each. Drift is a simulated electrode shift injected partway through the session.
 
-```mermaid
-flowchart LR
-    subgraph data["EMG replay / data"]
-        NP["NinaPro DB2 (.mat)"]
-        EP["emg2pose mini (.hdf5)"]
-        SYN["synthetic fallback"]
-    end
+| Subject | Accuracy before drift | After drift | After recalibration |
+|---|---|---|---|
+| 1 | 0.82 | 0.13 | 0.83 |
+| 2 | 0.83 | 0.14 | 0.83 |
+| 3 | 0.82 | 0.13 | 0.83 |
 
-    subgraph sig["myosignal/"]
-        LOAD["loaders + preprocess"]
-        WIN["windowing (250ms / 50ms stride)"]
-        FEAT["spectrogram PNG + RMS features"]
-        DRIFT["drift injection\n(electrode_shift / sweat / channel_swap)"]
-    end
+Drift was flagged within 1 to 2 seconds of injection in every run, and recovery took 3 new examples of the confused gesture.
 
-    subgraph brain["agent/"]
-        CLS["GLM-5.3-Flash classifier\n(or agent.mock_classifier when MOCK=1)"]
-        DD["drift_detector\n(rolling accuracy + confusion)"]
-        RECAL["recalibrator\n(interview + profile update)"]
-        PROF[("gesture_profiles/*.json")]
-    end
+![Accuracy over time with drift and recalibration](eval/report/accuracy_vs_time.png)
 
-    subgraph srv["web/"]
-        API["FastAPI\nWS /stream · GET /history · GET /stats"]
-    end
+![Before and after recalibration](eval/report/recalibration_before_after.png)
 
-    subgraph ui["frontend/ (React + Vite)"]
-        DASH["dashboard\n(accuracy, confusion matrix, cost)"]
-        HAND["3-D hand\n(Three.js)"]
-    end
+What these numbers do and do not show:
 
-    NP --> LOAD
-    EP --> LOAD
-    SYN --> LOAD
-    LOAD --> WIN --> FEAT
-    DRIFT -.injected into.-> WIN
-    FEAT --> CLS
-    CLS --> DD
-    DD -- "drift suspected" --> RECAL
-    RECAL <--> PROF
-    RECAL --> CLS
-    CLS --> API
-    DD --> API
-    RECAL --> API
-    API <--> DASH
-    API --> HAND
+- The synthetic EMG is generated by `myosignal/loaders.py` with a fixed amplitude signature per gesture. Real EMG is much messier, so real accuracy will be lower.
+- The electrode shift is a simple model I wrote, not a physiological one.
+- The k-NN baseline in `eval/baseline_results.json` scored about 0.23, but it was only given 38 training windows, so I do not treat it as a fair comparison yet.
+
+The pipeline can load real recordings (NinaPro DB2 `.mat` and Meta emg2pose `.hdf5`) from `data/`. Running the eval on NinaPro DB2 is the next thing I want to do.
+
+## Running it
+
+```bash
+pip install -r requirements.txt
+cd frontend && npm install && cd ..
+
+# backend, offline mode
+MOCK=1 uvicorn web.server:app --port 8000
+
+# frontend, in a second terminal
+cd frontend && npm run dev
 ```
 
-## Technical stack
+Open the URL Vite prints (usually http://localhost:5173).
 
-**Backend:** Python, FastAPI, WebSockets, SciPy (signal processing), scikit-learn (baseline + metrics), matplotlib (report figures), httpx (OpenRouter client).
-**Frontend:** React, Vite, TypeScript, Three.js (3-D hand), Recharts (charts), Zustand (state).
-**Model:** GLM-5.3-Flash via [OpenRouter](https://openrouter.ai) (`z-ai/glm-5.3-flash`), multimodal spectrogram classification.
+Other commands:
 
-## Repository layout
+```bash
+python -m eval.run        # offline eval, writes eval/results.json
+python -m eval.baselines  # k-NN baseline
+python -m eval.report     # regenerates the figures in eval/report/
+pytest -q                 # tests
+```
 
-| Path | Owns |
+On Windows the same steps are in `scripts/*.ps1`, and there is a `Makefile` if you have make.
+
+To try the LLM classifier, copy `.env.example` to `.env`, set `OPENROUTER_API_KEY`, and start the backend without `MOCK=1`.
+
+## Repo layout
+
+| Path | What's in it |
 |---|---|
-| `myosignal/` | dataset loading, windowing, spectrograms, drift injection |
-| `agent/` | classifier, drift detection, recalibration, cost tracking |
-| `web/` | FastAPI app (WebSocket + REST) |
-| `frontend/` | React/Vite dashboard + 3-D hand integration |
-| `assets/hand.html` | standalone procedural 3-D hand |
-| `eval/` | offline evaluation harness, classical baseline, report figures, demo script |
-
-See [CLAUDE.md](CLAUDE.md) for the full data contracts and parallel-session ownership map.
-
----
-
-## Local Windows quickstart
-
-```powershell
-# 1. Install dependencies
-py -m pip install -r requirements.txt
-cd frontend; npm install; cd ..
-
-# 2. (optional) real-mode secrets — skip entirely for MOCK mode
-copy .env.example .env
-# edit .env: set OPENROUTER_API_KEY=<your key>
-```
-
-Or via the orchestration scripts (works with or without GNU `make` — see below):
-
-```powershell
-.\scripts\setup.ps1
-```
-
-### Mock demo mode (no API key, no network)
-
-Runs the full pipeline with `agent.mock_classifier`, a network-free RMS heuristic. No `OPENROUTER_API_KEY` required.
-
-```powershell
-# terminal 1
-$env:MOCK = "1"
-py -m uvicorn web.server:app --reload --port 8000
-
-# terminal 2
-cd frontend
-npm run dev
-```
-
-Open the printed Vite URL (typically `http://localhost:5173`) — the dev server proxies `/stream`, `/history`, `/stats` to the backend on `:8000` (see `frontend/vite.config.ts`).
-
-Headless (no browser at all):
-
-```powershell
-.\scripts\demo.ps1
-```
-
-### Real OpenRouter mode
-
-```powershell
-copy .env.example .env
-# edit .env: OPENROUTER_API_KEY=sk-or-...
-py -m uvicorn web.server:app --reload --port 8000   # MOCK unset -> real GLM-5.3-Flash calls
-cd frontend; npm run dev
-```
-
-**Never commit `.env` or paste a real key into this repo** — `.env` is gitignored; `.env.example` stays empty.
-
-### Using GNU `make` instead
-
-If `make` is available (Git Bash, WSL, or `choco install make`), the same commands are:
-
-# MyoCopilot
-
-> An adaptive myoelectric prosthetic-control copilot that detects EMG drift and conversationally recalibrates personalized gesture profiles before control fails.
-
-🎥 **Demo video:** [Watch the MyoCopilot demo](REPLACE_WITH_VIDEO_URL)
-
-Hackathon build — research prototype, not a medical device. See [Limitations](#limitations).
-
-## Demo
-
-| Stable control | Drift detected | Personalized recovery |
-|---|---|---|
-| ![Stable myoelectric control](docs/screenshots/01-clean-control.png) | ![MyoCopilot detecting EMG drift](docs/screenshots/02-drift-detected.png) | ![Target gesture control recovered after recalibration](docs/screenshots/03-recalibrated.png) |
-
-Add three real browser screenshots before submission: clean control above the safety threshold, drift detection with the recalibration panel, and target-gesture recovery after fresh confirmation samples.
-
-## Why GLM-5.3-Flash?
-
-- GLM-5.3-Flash is integrated through OpenRouter as MyoCopilot’s production multimodal reasoning/classification path.
-- EMG windows are represented as multi-channel spectrograms plus compact session context and personalized calibration examples.
-- GLM supports the system’s multimodal pattern interpretation, agentic drift reasoning, and user-specific recalibration workflow.
-- The reproducible recording uses structured synthetic EMG-like signals and `MOCK=1`.
-- The real GLM-5.3-Flash path remains available for live OpenRouter testing.
-
-Do not treat this as medical validation or clinical accuracy — the mock recording and synthetic sessions are reproducible demos, not clinical evidence.
-
-## Demo flow
-
-1. A subject-specific EMG profile establishes stable gesture control.
-2. MyoCopilot streams gesture predictions to the bionic hand dashboard.
-3. A structured synthetic electrode-shift stress test degrades the learned signal profile.
-4. Rolling accuracy and confidence trigger drift detection.
-5. The agent identifies the most affected gesture confusion.
-6. MyoCopilot asks for three fresh confirmations of the affected gesture.
-7. The personalized gesture profile updates and target-gesture control recovers.
-
-## Repository map
-
-| Directory / file | Purpose |
-|---|---|
-| `agent/` | GLM integration, mock classifier, drift detection, cost tracking, and conversational recalibration logic |
-| `myosignal/` | EMG loading, preprocessing, feature extraction, spectrogram generation, and deterministic synthetic signal replay |
-| `web/` | FastAPI service, WebSocket stream, REST endpoints, and backend orchestration |
-| `frontend/` | React/Vite dashboard, 3D bionic hand integration, charts, controls, and demo mode |
-| `eval/` | Offline evaluation, k-NN baseline, headless demo harness, and report figures |
-| `assets/` | Bionic hand source assets and visual resources |
-| `scripts/` | Windows PowerShell setup, test, backend, frontend, demo, evaluation, and reporting commands |
-| `Dockerfile` / `serve.py` | Single-container deployment preparation for the frontend and API |
-
-See [CLAUDE.md](CLAUDE.md) for the full data contracts and parallel-session ownership map.
-
-## Reproducibility and safety
-
-- The default demo uses deterministic structured synthetic EMG-like data labeled `synthetic_demo_data`.
-- The electrode-shift condition is a structured synthetic stress test, not a clinically validated physiological model.
-- The project is a research/hackathon prototype and not a medical device.
-- Reported evaluation results do not establish clinical performance.
-- Real API keys must live only in `.env`.
-- `.env` must never be committed.
-- `.env.example` must contain no secret value.
-
----
-
-## Local Windows quickstart
-
-```powershell
-# Backend: reproducible demo mode
-$env:MOCK="1"
-py -m uvicorn web.server:app --reload --port 8000
-```
-
-```powershell
-# Frontend
-cd frontend
-npm install
-npm run dev
-```
-
-```powershell
-# Test the full project
-py -m pytest -q
-cd frontend
-npm run build
-```
-
-Preserve the rest of the detailed instructions and architecture in the original README for maintainers and reviewers.
-
-## Evaluation
-
-- Distinguishes clean, drift, and drift-plus-recalibration conditions.
-- See `eval/results.json` and `eval/report/` for evaluation outputs and figures.
-- All evaluation runs in CI/demo mode use synthetic data by default (`synthetic_demo_data`) — see the reproducibility disclaimer above.
-- The repository includes a transparent k-NN RMS baseline as a classical comparison (see `eval/baselines.py` and `eval/baseline_results.json`).
+| `myosignal/` | Loading, filtering, windowing, spectrograms, drift injection |
+| `agent/` | Classifiers, drift detector, recalibration, gesture profiles |
+| `web/` | FastAPI server (WebSocket stream plus REST) |
+| `frontend/` | React dashboard and 3D hand |
+| `eval/` | Offline evaluation, baseline, figures |
 
 ## Limitations
 
-- Synthetic/replay data by default.
-- Simplified structured drift model.
-- No clinical validation.
-- No human-subject trial.
-- Multimodal LLM interpretation remains exploratory in this setting.
-- A real deployment would require hardware integration, safety testing, user studies, and clinical validation.
+- All reported results are on synthetic data.
+- No testing with real users or real prosthetic hardware.
+- The drift model is simplified.
+- The LLM classifier is experimental and unevaluated.
 
-## Hackathon tracks
+## What I'd do next
 
-> MyoCopilot is submitted to the GLM-5.3-Flash Lightning Hackathon’s **Frontier Build** track for its multimodal, agentic adaptive-control pipeline. It is also designed for the **Most Viral** track through its visual bionic-hand demo: stable control → electrode shift → drift detection → conversational recovery.
+- Evaluate on NinaPro DB2 with a proper train and test split across sessions.
+- Retrain the k-NN and an LDA baseline with the same amount of data so the comparison is fair.
+- Compare 3 recalibration examples against 5 and 10 to see where recovery levels off.
+- Record my own EMG with a cheap armband and test drift from actually moving the electrodes.
